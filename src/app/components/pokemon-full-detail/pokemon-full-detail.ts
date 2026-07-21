@@ -50,6 +50,9 @@ export class PokemonFullDetailComponent implements OnInit {
       next: (data) => {
         this.pokemon.set(data);
         this.loading.set(false);
+        if (typeof window !== 'undefined') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       },
       error: () => {
         this.error.set(true);
@@ -97,6 +100,28 @@ export class PokemonFullDetailComponent implements OnInit {
       return ab.descriptionPt || ab.descriptionEn || ab.description || 'Sem descrição disponível.';
     }
     return ab.descriptionEn || ab.description || 'No description available.';
+  }
+
+  getEvolutionMethodText(node: any): string {
+    if (!node) return '';
+    if (this.configService.deveTraduzirDescricao()) {
+      return node.methodPt || node.methodEn || '';
+    }
+    return node.methodEn || node.methodPt || '';
+  }
+
+  getItemSprite(node: any): string | null {
+    const item = node?.methodDetails?.item || node?.methodDetails?.heldItem;
+    return item?.spriteUrl || null;
+  }
+
+  getItemName(node: any): string {
+    const item = node?.methodDetails?.item || node?.methodDetails?.heldItem;
+    if (!item) return '';
+    if (this.configService.deveTraduzirDescricao()) {
+      return item.namePt || item.nameEn || item.name;
+    }
+    return item.nameEn || item.namePt || item.name;
   }
 
   getCategoryLabel(category: string): string {

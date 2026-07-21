@@ -24,9 +24,30 @@
     </nav>
 
     <div class="header-badges">
+      <!-- Settings Config Button -->
       <button class="config-btn" (click)="openConfigModal()" title="Configurações de Tradução" aria-label="Configurações">
         <i class="ph-bold ph-gear"></i>
       </button>
+
+      <!-- Auth User Badge / Login Button -->
+      <ng-container *ngIf="authService.isLoggedIn(); else guestTpl">
+        <div class="user-badge-group">
+          <span class="user-avatar-chip" [title]="authService.currentUser()?.email">
+            <i class="ph-bold ph-user-circle avatar-icon"></i>
+            <span class="user-name">{{ authService.currentUser()?.username }}</span>
+          </span>
+          <button class="logout-btn" (click)="logout()" title="Sair da conta">
+            <i class="ph-bold ph-sign-out"></i>
+          </button>
+        </div>
+      </ng-container>
+
+      <ng-template #guestTpl>
+        <a routerLink="/login" class="login-nav-btn">
+          <i class="ph-bold ph-user-circle"></i>
+          <span>Entrar / Cadastrar</span>
+        </a>
+      </ng-template>
     </div>
   </div>
 </header>

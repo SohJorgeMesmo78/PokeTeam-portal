@@ -124,6 +124,80 @@
   }
 }
 
+/* User Badge & Login Button */
+.user-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  padding: 0.25rem 0.35rem 0.25rem 0.75rem;
+  border-radius: 9999px;
+}
+
+.user-avatar-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+
+  .avatar-icon {
+    font-size: 1.2rem;
+    color: var(--accent-color);
+  }
+
+  .user-name {
+    text-transform: capitalize;
+  }
+}
+
+.logout-btn {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #ffffff;
+  }
+}
+
+.login-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 170, 0, 0.12);
+  border: 1px solid var(--accent-color);
+  border-radius: 9999px;
+  color: var(--accent-color);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.25s ease;
+
+  i {
+    font-size: 1.1rem;
+  }
+
+  &:hover {
+    background: var(--accent-color);
+    color: #121214;
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+}
+
 .main-content {
   min-height: calc(100vh - 160px);
   padding-bottom: 2rem;

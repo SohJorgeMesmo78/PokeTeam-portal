@@ -60,7 +60,124 @@
       </div>
     </div>
 
-    <!-- Main Grid Content -->
+    <!-- Full-Width Evolution Chain Card -->
+    <div class="box-card evolution-card full-width-evo" *ngIf="pokemon()?.evolutionChain">
+      <div class="card-title-bar">
+        <h3><i class="ph-bold ph-git-fork"></i> Cadeia Evolutiva</h3>
+        <span class="click-tip">Passe o mouse no item para ver o nome e clique para navegar</span>
+      </div>
+
+      <div class="evo-tree">
+        <!-- Stage 1 (Base Form) -->
+        <div class="evo-node-group">
+          <div 
+            class="evo-card" 
+            [class.active-stage]="pokemon().evolutionChain.id === pokemon().id"
+            [routerLink]="['/pokemon', pokemon().evolutionChain.id]"
+          >
+            <img [src]="pokemon().evolutionChain.spriteUrl" [alt]="pokemon().evolutionChain.name" class="evo-img" />
+            <span class="evo-id">#{{ pokemon().evolutionChain.id.toString().padStart(4, '0') }}</span>
+            <span class="evo-name">{{ pokemon().evolutionChain.name }}</span>
+            <div class="evo-types">
+              <span *ngFor="let t of pokemon().evolutionChain.types" class="type-badge tiny" [ngClass]="'type-' + t">{{ t }}</span>
+            </div>
+          </div>
+
+          <!-- Stage 2 Branches -->
+          <div *ngIf="pokemon().evolutionChain.evolvesTo?.length" class="evo-children-list">
+            <div *ngFor="let stage2 of pokemon().evolutionChain.evolvesTo" class="evo-branch-item">
+              <div class="evo-arrow-bar">
+                <div class="method-pill" [title]="getEvolutionMethodText(stage2)">
+                  <i class="ph-bold ph-arrow-down arrow-down-icon"></i>
+                  <i class="ph-bold ph-arrow-right arrow-right-icon"></i>
+
+                  <!-- Item Image (if item or heldItem) -->
+                  <div *ngIf="getItemSprite(stage2)" class="item-sprite-wrap" [title]="getItemName(stage2)">
+                    <img [src]="getItemSprite(stage2)!" [alt]="getItemName(stage2)" class="item-img" />
+                  </div>
+
+                  <!-- Text or Level -->
+                  <span *ngIf="!getItemSprite(stage2) && getEvolutionMethodText(stage2)" class="method-text">
+                    {{ getEvolutionMethodText(stage2) }}
+                  </span>
+
+                  <!-- Gender Symbol below/beside item -->
+                  <i *ngIf="stage2.methodDetails?.gender === 'male'" class="ph-bold ph-gender-male gender-icon male" title="Se Macho (Male)"></i>
+                  <i *ngIf="stage2.methodDetails?.gender === 'female'" class="ph-bold ph-gender-female gender-icon female" title="Se Fêmea (Female)"></i>
+
+                  <!-- Time of Day & Friendship Icons -->
+                  <i *ngIf="stage2.methodDetails?.timeOfDay === 'day'" class="ph-bold ph-sun time-icon" title="Durante o Dia"></i>
+                  <i *ngIf="stage2.methodDetails?.timeOfDay === 'night'" class="ph-bold ph-moon time-icon" title="Durante a Noite"></i>
+                  <i *ngIf="stage2.methodDetails?.happiness" class="ph-bold ph-heart heart-icon" title="Felicidade Alta"></i>
+                  <i *ngIf="stage2.methodDetails?.trigger === 'trade'" class="ph-bold ph-arrows-left-right trade-icon" title="Troca"></i>
+                </div>
+              </div>
+
+              <div 
+                class="evo-card" 
+                [class.active-stage]="stage2.id === pokemon().id"
+                [routerLink]="['/pokemon', stage2.id]"
+              >
+                <img [src]="stage2.spriteUrl" [alt]="stage2.name" class="evo-img" />
+                <span class="evo-id">#{{ stage2.id.toString().padStart(4, '0') }}</span>
+                <span class="evo-name">{{ stage2.name }}</span>
+                <div class="evo-types">
+                  <span *ngFor="let t of stage2.types" class="type-badge tiny" [ngClass]="'type-' + t">{{ t }}</span>
+                </div>
+              </div>
+
+              <!-- Stage 3 Branches -->
+              <div *ngIf="stage2.evolvesTo?.length" class="evo-subchildren-list">
+                <div *ngFor="let stage3 of stage2.evolvesTo" class="evo-branch-item">
+                  <div class="evo-arrow-bar">
+                    <div class="method-pill" [title]="getEvolutionMethodText(stage3)">
+                      <i class="ph-bold ph-arrow-down arrow-down-icon"></i>
+                      <i class="ph-bold ph-arrow-right arrow-right-icon"></i>
+
+                      <!-- Item Image (if item or heldItem) -->
+                      <div *ngIf="getItemSprite(stage3)" class="item-sprite-wrap" [title]="getItemName(stage3)">
+                        <img [src]="getItemSprite(stage3)!" [alt]="getItemName(stage3)" class="item-img" />
+                      </div>
+
+                      <!-- Text or Level -->
+                      <span *ngIf="!getItemSprite(stage3) && getEvolutionMethodText(stage3)" class="method-text">
+                        {{ getEvolutionMethodText(stage3) }}
+                      </span>
+
+                      <!-- Gender Symbol below/beside item -->
+                      <i *ngIf="stage3.methodDetails?.gender === 'male'" class="ph-bold ph-gender-male gender-icon male" title="Se Macho (Male)"></i>
+                      <i *ngIf="stage3.methodDetails?.gender === 'female'" class="ph-bold ph-gender-female gender-icon female" title="Se Fêmea (Female)"></i>
+
+                      <!-- Time of Day & Friendship Icons -->
+                      <i *ngIf="stage3.methodDetails?.timeOfDay === 'day'" class="ph-bold ph-sun time-icon" title="Durante o Dia"></i>
+                      <i *ngIf="stage3.methodDetails?.timeOfDay === 'night'" class="ph-bold ph-moon time-icon" title="Durante a Noite"></i>
+                      <i *ngIf="stage3.methodDetails?.happiness" class="ph-bold ph-heart heart-icon" title="Felicidade Alta"></i>
+                      <i *ngIf="stage3.methodDetails?.trigger === 'trade'" class="ph-bold ph-arrows-left-right trade-icon" title="Troca"></i>
+                    </div>
+                  </div>
+
+                  <div 
+                    class="evo-card" 
+                    [class.active-stage]="stage3.id === pokemon().id"
+                    [routerLink]="['/pokemon', stage3.id]"
+                  >
+                    <img [src]="stage3.spriteUrl" [alt]="stage3.name" class="evo-img" />
+                    <span class="evo-id">#{{ stage3.id.toString().padStart(4, '0') }}</span>
+                    <span class="evo-name">{{ stage3.name }}</span>
+                    <div class="evo-types">
+                      <span *ngFor="let t of stage3.types" class="type-badge tiny" [ngClass]="'type-' + t">{{ t }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid Content (Left: Stats & Abilities, Right: Moves) -->
     <div class="content-grid">
       <!-- Left Column: Base Stats & Abilities -->
       <div class="left-col">

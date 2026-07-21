@@ -1,7 +1,8 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { RouterModule, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ConfigModalComponent } from './components/config-modal/config-modal.component';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,7 @@ import { ConfigModalComponent } from './components/config-modal/config-modal.com
   styleUrl: './app.scss'
 })
 export class App {
+  public authService = inject(AuthService);
   showConfigModal = false;
 
   openConfigModal(): void {
@@ -19,6 +21,10 @@ export class App {
 
   closeConfigModal(): void {
     this.showConfigModal = false;
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 
   @HostListener('document:keydown.escape')
