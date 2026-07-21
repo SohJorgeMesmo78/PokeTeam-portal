@@ -40,9 +40,9 @@ export class PokemonDetailModalComponent {
   get currentArtworkUrl(): string {
     if (this.showShiny()) {
       return (
-        this.pokemon.sprites.other?.['official-artwork']?.front_shiny ||
-        this.pokemon.sprites.front_shiny ||
-        this.currentDefaultArtwork
+        this.pokemon.sprites?.front_shiny ||
+        (this.pokemon as any).shinySpriteUrl ||
+        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${this.pokemon.id}.png`
       );
     }
     return this.currentDefaultArtwork;
@@ -50,10 +50,9 @@ export class PokemonDetailModalComponent {
 
   private get currentDefaultArtwork(): string {
     return (
-      this.pokemon.sprites.other?.['official-artwork']?.front_default ||
-      this.pokemon.sprites.other?.home?.front_default ||
-      this.pokemon.sprites.front_default ||
-      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png'
+      this.pokemon.sprites?.front_default ||
+      (this.pokemon as any).spriteUrl ||
+      `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${this.pokemon.id}.png`
     );
   }
 
