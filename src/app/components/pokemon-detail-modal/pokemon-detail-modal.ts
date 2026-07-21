@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter, HostListener, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { PokemonDetail, PokemonSpecies } from '../../models/pokemon.model';
 
 @Component({
@@ -10,6 +11,8 @@ import { PokemonDetail, PokemonSpecies } from '../../models/pokemon.model';
   styleUrl: './pokemon-detail-modal.scss'
 })
 export class PokemonDetailModalComponent {
+  private router = inject(Router);
+
   @Input({ required: true }) pokemon!: PokemonDetail;
   @Input() species: PokemonSpecies | null = null;
   @Output() closeModal = new EventEmitter<void>();
@@ -27,6 +30,11 @@ export class PokemonDetailModalComponent {
 
   toggleShiny(): void {
     this.showShiny.update(val => !val);
+  }
+
+  goToFullDetails(): void {
+    this.close();
+    this.router.navigate(['/pokemon', this.pokemon.id]);
   }
 
   get formattedId(): string {

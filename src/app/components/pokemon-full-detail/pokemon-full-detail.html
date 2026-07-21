@@ -1,0 +1,324 @@
+<div class="full-detail-container">
+  <!-- Back Navigation Button -->
+  <div class="top-nav-bar">
+    <button class="back-btn" routerLink="/pokedex">
+      <span>← Voltar para a Pokédex</span>
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-state">
+    <div class="pokeball-spinner"></div>
+    <p>Carregando informações completas do Pokémon...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error()" class="error-state">
+    <h3>⚠️ Erro ao carregar Pokémon</h3>
+    <p>Não foi possível encontrar as informações solicitadas.</p>
+    <button class="back-btn" routerLink="/pokedex">Voltar para a Pokédex</button>
+  </div>
+
+  <!-- Loaded Full Content -->
+  <div *ngIf="!loading() && !error() && pokemon()" class="detail-card-layout">
+    <!-- Header Hero Banner -->
+    <div class="hero-section" [ngClass]="'type-bg-' + primaryType">
+      <div class="sprite-box">
+        <img [src]="currentSprite" [alt]="pokemon().name" class="pixel-sprite" />
+        <button class="shiny-pill-btn" [class.active]="showShiny()" (click)="toggleShiny()">
+          ✨ {{ showShiny() ? 'Ver Normal' : 'Ver Shiny' }}
+        </button>
+      </div>
+
+      <div class="hero-info">
+        <span class="id-tag">{{ formattedId }}</span>
+        <h1 class="pokemon-title">{{ pokemon().name }}</h1>
+
+        <div class="type-container">
+          <span *ngFor="let t of pokemon().types" class="type-badge" [ngClass]="'type-' + t.type.name">
+            {{ t.type.name }}
+          </span>
+        </div>
+
+        <div class="stats-pills-row">
+          <div class="stat-pill">
+            <span class="label">Altura</span>
+            <span class="val">{{ pokemon().height / 10 }} m</span>
+          </div>
+          <div class="stat-pill">
+            <span class="label">Peso</span>
+            <span class="val">{{ pokemon().weight / 10 }} kg</span>
+          </div>
+          <div class="stat-pill">
+            <span class="label">Exp. Base</span>
+            <span class="val">{{ pokemon().base_experience }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid Content -->
+    <div class="content-grid">
+      <!-- Left Column: Base Stats & Abilities -->
+      <div class="left-col">
+        <!-- Base Stats -->
+        <div class="box-card">
+          <h3>📊 Estatísticas Base</h3>
+          <div class="stats-list">
+            <div *ngFor="let s of pokemon().stats" class="stat-row">
+              <span class="stat-name">{{ getStatName(s.stat.name) }}</span>
+              <span class="stat-value">{{ s.base_stat }}</span>
+              <div class="stat-bar-bg">
+                <div 
+                  class="stat-bar-fill" 
+                  [ngClass]="getStatBarClass(s.base_stat)" 
+                  [style.width.%]="getStatPercentage(s.base_stat)"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Abilities -->
+        <div class="box-card">
+          <div class="card-title-bar">
+            <h3>🌟 Habilidades</h3>
+            <span class="click-tip">Clique para ver o efeito</span>
+          </div>
+          <div class="abilities-wrap">
+            <div 
+              *ngFor="let a of pokemon().abilities" 
+              class="ability-card clickable" 
+              [class.hidden]="a.is_hidden"
+              (click)="openAbilityDetail(a)"
+            >
+              <span class="ability-name">{{ a.ability.name }}</span>
+              <span *ngIf="a.is_hidden" class="hidden-badge">Habilidade Oculta</span>
+              <span *ngIf="!a.is_hidden" class="normal-badge">Normal</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Full Moveset Tabs (Level Up, TM, Breeding, Tutor) -->
+      <div class="right-col">
+        <div class="box-card moves-card">
+          <div class="card-title-bar">
+            <h3>⚔️ Golpes & Ataques Aprendidos</h3>
+            <span class="click-tip">Clique em qualquer golpe para ver a descrição detalhada</span>
+          </div>
+
+          <!-- Move Category Tabs -->
+          <div class="moves-tabs">
+            <button 
+              class="tab-btn" 
+              [class.active]="activeTab() === 'level'" 
+              (click)="setTab('level')"
+            >
+              📈 Por Nível ({{ pokemon().moves?.levelUp?.length || 0 }})
+            </button>
+            <button 
+              class="tab-btn" 
+              [class.active]="activeTab() === 'tm'" 
+              (click)="setTab('tm')"
+            >
+              💿 Por TM ({{ pokemon().moves?.tm?.length || 0 }})
+            </button>
+            <button 
+              class="tab-btn" 
+              [class.active]="activeTab() === 'egg'" 
+              (click)="setTab('egg')"
+            >
+              🥚 Por Cruzamento ({{ pokemon().moves?.egg?.length || 0 }})
+            </button>
+            <button 
+              class="tab-btn" 
+              [class.active]="activeTab() === 'tutor'" 
+              (click)="setTab('tutor')"
+            >
+              🎓 Por Tutor ({{ pokemon().moves?.tutor?.length || 0 }})
+            </button>
+          </div>
+
+          <!-- Tab Content: Level Up -->
+          <div *ngIf="activeTab() === 'level'" class="tab-content">
+            <div *ngIf="!pokemon().moves?.levelUp?.length" class="no-moves">
+              Nenhum golpe por nível registrado.
+            </div>
+            <table *ngIf="pokemon().moves?.levelUp?.length" class="moves-table">
+              <thead>
+                <tr>
+                  <th>Nível</th>
+                  <th>Nome do Golpe</th>
+                  <th>Tipo</th>
+                  <th>Categoria</th>
+                  <th>Poder</th>
+                  <th>Acc</th>
+                  <th>PP</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let m of pokemon().moves.levelUp" class="move-row-clickable" (click)="openMoveDetail(m)">
+                  <td><span class="level-badge">Lvl {{ m.level }}</span></td>
+                  <td class="move-name-cell">{{ m.name }}</td>
+                  <td>
+                    <span class="type-badge small" [ngClass]="'type-' + (m.type || 'normal')">
+                      {{ m.type || 'normal' }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="cat-pill" [ngClass]="m.category || 'status'">
+                      {{ getCategoryIcon(m.category) }} {{ getCategoryLabel(m.category) }}
+                    </span>
+                  </td>
+                  <td class="num-cell">{{ m.power ?? '-' }}</td>
+                  <td class="num-cell">{{ m.accuracy ? m.accuracy + '%' : '-' }}</td>
+                  <td class="num-cell">{{ m.pp ?? '-' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Tab Content: TM / Machine -->
+          <div *ngIf="activeTab() === 'tm'" class="tab-content">
+            <div *ngIf="!pokemon().moves?.tm?.length" class="no-moves">
+              Nenhum golpe por TM registrado.
+            </div>
+            <div *ngIf="pokemon().moves?.tm?.length" class="moves-grid">
+              <div 
+                *ngFor="let m of pokemon().moves.tm" 
+                class="move-card-chip tm-chip"
+                (click)="openMoveDetail(m)"
+              >
+                <div class="chip-top">
+                  <span class="move-chip-title">{{ m.name }}</span>
+                  <span class="cat-icon">{{ getCategoryIcon(m.category) }}</span>
+                </div>
+                <div class="chip-bottom">
+                  <span class="type-badge tiny" [ngClass]="'type-' + (m.type || 'normal')">
+                    {{ m.type || 'normal' }}
+                  </span>
+                  <span class="chip-power" *ngIf="m.power">PWR {{ m.power }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Content: Egg / Breeding -->
+          <div *ngIf="activeTab() === 'egg'" class="tab-content">
+            <div *ngIf="!pokemon().moves?.egg?.length" class="no-moves">
+              Nenhum golpe de cruzamento registrado.
+            </div>
+            <div *ngIf="pokemon().moves?.egg?.length" class="moves-grid">
+              <div 
+                *ngFor="let m of pokemon().moves.egg" 
+                class="move-card-chip egg-chip"
+                (click)="openMoveDetail(m)"
+              >
+                <div class="chip-top">
+                  <span class="move-chip-title">{{ m.name }}</span>
+                  <span class="cat-icon">{{ getCategoryIcon(m.category) }}</span>
+                </div>
+                <div class="chip-bottom">
+                  <span class="type-badge tiny" [ngClass]="'type-' + (m.type || 'normal')">
+                    {{ m.type || 'normal' }}
+                  </span>
+                  <span class="chip-power" *ngIf="m.power">PWR {{ m.power }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Content: Tutor -->
+          <div *ngIf="activeTab() === 'tutor'" class="tab-content">
+            <div *ngIf="!pokemon().moves?.tutor?.length" class="no-moves">
+              Nenhum golpe de tutor registrado.
+            </div>
+            <div *ngIf="pokemon().moves?.tutor?.length" class="moves-grid">
+              <div 
+                *ngFor="let m of pokemon().moves.tutor" 
+                class="move-card-chip tutor-chip"
+                (click)="openMoveDetail(m)"
+              >
+                <div class="chip-top">
+                  <span class="move-chip-title">{{ m.name }}</span>
+                  <span class="cat-icon">{{ getCategoryIcon(m.category) }}</span>
+                </div>
+                <div class="chip-bottom">
+                  <span class="type-badge tiny" [ngClass]="'type-' + (m.type || 'normal')">
+                    {{ m.type || 'normal' }}
+                  </span>
+                  <span class="chip-power" *ngIf="m.power">PWR {{ m.power }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Move Detail Modal Popup -->
+  <div *ngIf="selectedMove()" class="move-modal-backdrop" (click)="closeMoveDetail()">
+    <div class="move-modal-card" (click)="$event.stopPropagation()">
+      <button class="close-modal-btn" (click)="closeMoveDetail()">✕</button>
+
+      <div class="move-modal-header">
+        <h2 class="move-modal-title">{{ selectedMove().name }}</h2>
+        <div class="move-badges-row">
+          <span class="type-badge" [ngClass]="'type-' + (selectedMove().type || 'normal')">
+            {{ selectedMove().type || 'normal' }}
+          </span>
+          <span class="cat-pill" [ngClass]="selectedMove().category || 'status'">
+            {{ getCategoryIcon(selectedMove().category) }} {{ getCategoryLabel(selectedMove().category) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="move-stats-grid">
+        <div class="m-stat-box">
+          <span class="m-label">Poder</span>
+          <span class="m-val">{{ selectedMove().power ?? '-' }}</span>
+        </div>
+        <div class="m-stat-box">
+          <span class="m-label">Precisão</span>
+          <span class="m-val">{{ selectedMove().accuracy ? selectedMove().accuracy + '%' : '-' }}</span>
+        </div>
+        <div class="m-stat-box">
+          <span class="m-label">PP</span>
+          <span class="m-val">{{ selectedMove().pp ?? '-' }}</span>
+        </div>
+      </div>
+
+      <div class="move-description-box">
+        <h4>Efeito / Descrição (Inglês):</h4>
+        <p>{{ selectedMove().description || 'No description available.' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ability Detail Modal Popup -->
+  <div *ngIf="selectedAbility()" class="move-modal-backdrop" (click)="closeAbilityDetail()">
+    <div class="move-modal-card" (click)="$event.stopPropagation()">
+      <button class="close-modal-btn" (click)="closeAbilityDetail()">✕</button>
+
+      <div class="move-modal-header">
+        <h2 class="move-modal-title">{{ selectedAbility().ability.name }}</h2>
+        <div class="move-badges-row">
+          <span 
+            class="cat-pill" 
+            [class.hidden]="selectedAbility().is_hidden" 
+            [class.special]="!selectedAbility().is_hidden"
+          >
+            🌟 {{ selectedAbility().is_hidden ? 'Habilidade Oculta' : 'Habilidade Normal' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="move-description-box">
+        <h4>Efeito / Descrição:</h4>
+        <p>{{ selectedAbility().ability.description || 'No description available for this ability.' }}</p>
+      </div>
+    </div>
+  </div>
+</div>

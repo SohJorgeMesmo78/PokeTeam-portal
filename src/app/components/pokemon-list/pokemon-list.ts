@@ -1,6 +1,17 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  OnDestroy,
+  signal,
+  computed,
+  inject,
+  ElementRef,
+  ViewChild
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
 import { PokeApiService } from '../../services/poke-api.service';
 import { PokemonDetail, PokemonSpecies } from '../../models/pokemon.model';
 import { PokemonCardComponent } from '../pokemon-card/pokemon-card';
@@ -18,16 +29,22 @@ import { PokemonDetailModalComponent } from '../pokemon-detail-modal/pokemon-det
   templateUrl: './pokemon-list.html',
   styleUrl: './pokemon-list.scss'
 })
-export class PokemonListComponent implements OnInit {
+export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
   private pokeApiService = inject(PokeApiService);
+
+  @ViewChild('scrollSentinel') scrollSentinel?: ElementRef<HTMLDivElement>;
 
   pokemonList = signal<PokemonDetail[]>([]);
   loading = signal<boolean>(true);
   loadingMore = signal<boolean>(false);
-  
+
   searchQuery = signal<string>('');
-  selectedType = signal<string>('');
+  selectedTypes = signal<string[]>([]);
+  selectedGens = signal<number[]>([]);
+  filtersCollapsed = signal<boolean>(false);
+
   availableTypes = signal<string[]>([]);
+  readonly availableGens = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   selectedPokemon = signal<PokemonDetail | null>(null);
   selectedSpecies = signal<PokemonSpecies | null>(null);
@@ -36,145 +53,177 @@ export class PokemonListComponent implements OnInit {
   offset = 0;
   readonly limit = 24;
   hasMore = signal<boolean>(true);
-  searchError = signal<string | null>(null);
+  totalCount = signal<number>(0);
 
-  // Computed filtered list based on search query
-  filteredPokemon = computed(() => {
-    const query = this.searchQuery().trim().toLowerCase();
-    const list = this.pokemonList();
+  private searchSubject = new Subject<string>();
+  private searchSub?: Subscription;
+  private observer?: IntersectionObserver;
 
-    if (!query) return list;
-
-    return list.filter(p => 
-      p.name.toLowerCase().includes(query) || 
-      p.id.toString() === query || 
-      `#${p.id.toString().padStart(4, '0')}`.includes(query)
-    );
+  activeFiltersCount = computed(() => {
+    let count = 0;
+    if (this.searchQuery().trim()) count++;
+    count += this.selectedTypes().length;
+    count += this.selectedGens().length;
+    return count;
   });
 
   ngOnInit(): void {
-    this.loadInitialData();
+    this.loadInitialTypes();
+
+    this.searchSub = this.searchSubject
+      .pipe(debounceTime(350), distinctUntilChanged())
+      .subscribe((query) => {
+        this.searchQuery.set(query);
+        this.resetAndFetch();
+      });
+
+    this.resetAndFetch();
   }
 
-  loadInitialData(): void {
-    this.loading.set(true);
+  ngAfterViewInit(): void {
+    this.setupIntersectionObserver();
+  }
+
+  ngOnDestroy(): void {
+    this.searchSub?.unsubscribe();
+    this.observer?.disconnect();
+  }
+
+  private setupIntersectionObserver(): void {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+
+    this.observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && this.hasMore() && !this.loadingMore() && !this.loading()) {
+          this.loadMore();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+
+    if (this.scrollSentinel?.nativeElement) {
+      this.observer.observe(this.scrollSentinel.nativeElement);
+    }
+  }
+
+  loadInitialTypes(): void {
     this.pokeApiService.getTypes().subscribe({
       next: (res) => {
         const types = res.results
-          .map(t => t.name)
-          .filter(t => t !== 'unknown' && t !== 'shadow');
+          .map((t) => t.name)
+          .filter((t) => t !== 'unknown' && t !== 'shadow');
         this.availableTypes.set(types);
       }
     });
-
-    this.fetchPokemonBatch(0, true);
   }
 
-  fetchPokemonBatch(offset: number, isInitial: boolean = false): void {
-    if (isInitial) {
-      this.loading.set(true);
-    } else {
-      this.loadingMore.set(true);
-    }
+  resetAndFetch(): void {
+    this.offset = 0;
+    this.loading.set(true);
+    this.hasMore.set(true);
 
-    this.pokeApiService.getPokemonList(offset, this.limit).subscribe({
-      next: (res) => {
-        if (!res.next) {
-          this.hasMore.set(false);
+    this.pokeApiService
+      .getPokemonsWithFilters(
+        0,
+        this.limit,
+        this.searchQuery(),
+        this.selectedTypes(),
+        this.selectedGens()
+      )
+      .subscribe({
+        next: (res) => {
+          this.pokemonList.set(res.data);
+          this.totalCount.set(res.total);
+          this.hasMore.set(res.hasMore);
+          this.loading.set(false);
+          this.reobserveSentinel();
+        },
+        error: () => {
+          this.loading.set(false);
         }
-        const names = res.results.map(r => r.name);
-        this.pokeApiService.getMultiplePokemonDetails(names).subscribe({
-          next: (details) => {
-            if (isInitial) {
-              this.pokemonList.set(details);
-              this.loading.set(false);
-            } else {
-              this.pokemonList.update(current => [...current, ...details]);
-              this.loadingMore.set(false);
-            }
-          },
-          error: () => {
-            this.loading.set(false);
-            this.loadingMore.set(false);
-          }
-        });
-      },
-      error: () => {
-        this.loading.set(false);
-        this.loadingMore.set(false);
-      }
-    });
+      });
   }
 
   loadMore(): void {
-    if (this.loadingMore() || !this.hasMore() || this.selectedType()) return;
+    if (this.loadingMore() || !this.hasMore() || this.loading()) return;
+
+    this.loadingMore.set(true);
     this.offset += this.limit;
-    this.fetchPokemonBatch(this.offset, false);
-  }
 
-  filterByType(type: string): void {
-    if (this.selectedType() === type) {
-      // Clear filter
-      this.selectedType.set('');
-      this.offset = 0;
-      this.hasMore.set(true);
-      this.fetchPokemonBatch(0, true);
-      return;
-    }
-
-    this.selectedType.set(type);
-    this.loading.set(true);
-    this.searchError.set(null);
-
-    this.pokeApiService.getPokemonByType(type).subscribe({
-      next: (names) => {
-        // Fetch details for the first 30 pokemon of this type
-        const slicedNames = names.slice(0, 36);
-        this.pokeApiService.getMultiplePokemonDetails(slicedNames).subscribe({
-          next: (details) => {
-            this.pokemonList.set(details);
-            this.loading.set(false);
-            this.hasMore.set(false);
-          },
-          error: () => this.loading.set(false)
-        });
-      },
-      error: () => this.loading.set(false)
-    });
-  }
-
-  clearTypeFilter(): void {
-    this.selectedType.set('');
-    this.offset = 0;
-    this.hasMore.set(true);
-    this.fetchPokemonBatch(0, true);
-  }
-
-  onSearchInput(value: string): void {
-    this.searchQuery.set(value);
-    this.searchError.set(null);
-
-    const trimmed = value.trim().toLowerCase();
-    if (!trimmed) return;
-
-    // Check if matching pokemon is already loaded
-    const foundLocal = this.pokemonList().some(
-      p => p.name.toLowerCase() === trimmed || p.id.toString() === trimmed
-    );
-
-    // If not found in loaded list and user typed exact name/id, attempt direct API search
-    if (!foundLocal && trimmed.length >= 2 && !this.selectedType()) {
-      this.pokeApiService.getPokemonDetails(trimmed).subscribe({
-        next: (detail) => {
-          if (!this.pokemonList().some(p => p.id === detail.id)) {
-            this.pokemonList.update(current => [detail, ...current]);
-          }
+    this.pokeApiService
+      .getPokemonsWithFilters(
+        this.offset,
+        this.limit,
+        this.searchQuery(),
+        this.selectedTypes(),
+        this.selectedGens()
+      )
+      .subscribe({
+        next: (res) => {
+          this.pokemonList.update((current) => [...current, ...res.data]);
+          this.hasMore.set(res.hasMore);
+          this.loadingMore.set(false);
+          this.reobserveSentinel();
         },
         error: () => {
-          // Silent catch for live typing search
+          this.loadingMore.set(false);
         }
       });
+  }
+
+  private reobserveSentinel(): void {
+    setTimeout(() => {
+      if (this.observer && this.scrollSentinel?.nativeElement) {
+        this.observer.disconnect();
+        this.observer.observe(this.scrollSentinel.nativeElement);
+      }
+    }, 100);
+  }
+
+  onSearchInputChange(value: string): void {
+    this.searchSubject.next(value);
+  }
+
+  toggleTypeFilter(type: string): void {
+    const current = [...this.selectedTypes()];
+    const index = current.indexOf(type);
+
+    if (index >= 0) {
+      current.splice(index, 1);
+    } else {
+      if (current.length >= 2) {
+        current.shift(); // Max 2 types allowed
+      }
+      current.push(type);
     }
+
+    this.selectedTypes.set(current);
+    this.resetAndFetch();
+  }
+
+  toggleGenFilter(gen: number): void {
+    const current = [...this.selectedGens()];
+    const index = current.indexOf(gen);
+
+    if (index >= 0) {
+      current.splice(index, 1);
+    } else {
+      current.push(gen);
+    }
+
+    this.selectedGens.set(current);
+    this.resetAndFetch();
+  }
+
+  toggleFiltersCollapse(): void {
+    this.filtersCollapsed.update((val) => !val);
+  }
+
+  clearAllFilters(): void {
+    this.searchQuery.set('');
+    this.selectedTypes.set([]);
+    this.selectedGens.set([]);
+    this.resetAndFetch();
   }
 
   openPokemonDetail(pokemon: PokemonDetail): void {

@@ -95,17 +95,16 @@
     max-height: 100%;
     object-fit: contain;
     image-rendering: pixelated;
+    pointer-events: none;
     transform: scale(1.6);
     filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.5));
     transition: transform 0.3s ease;
-
-    &:hover {
-      transform: scale(1.75);
-    }
   }
 }
 
 .shiny-toggle-btn {
+  position: relative;
+  z-index: 10;
   margin-top: 0.75rem;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -285,4 +284,26 @@
   &.stat-medium { background: #f59e0b; }
   &.stat-high { background: #10b981; }
   &.stat-super { background: #3b82f6; }
+}
+
+.full-details-btn {
+  margin-top: 1.25rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--accent-color);
+  color: #121214;
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 800;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px var(--accent-glow);
+  transition: all 0.25s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--accent-glow);
+    filter: brightness(1.08);
+  }
 }

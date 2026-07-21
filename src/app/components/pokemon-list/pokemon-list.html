@@ -1,47 +1,105 @@
 <div class="pokedex-container">
-  <!-- Search & Filter Controls -->
+  <!-- Search & Filter Controls (Sticky Header) -->
   <section class="controls-section">
-    <div class="search-bar-wrapper">
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"></circle>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-      </svg>
-      <input 
-        type="text" 
-        class="search-input" 
-        placeholder="Buscar Pokémon por nome ou nº (#0025)..." 
-        [ngModel]="searchQuery()"
-        (ngModelChange)="onSearchInput($event)"
-      />
-      <button 
-        *ngIf="searchQuery()" 
-        class="clear-search-btn" 
-        (click)="onSearchInput('')" 
-        aria-label="Limpar busca"
-      >
-        ✕
+    <div class="controls-header">
+      <!-- Search Bar -->
+      <div class="search-bar-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="Buscar Pokémon por nome ou nº (#0025)..." 
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchInputChange($event)"
+        />
+        <button 
+          *ngIf="searchQuery()" 
+          class="clear-search-btn" 
+          (click)="onSearchInputChange('')" 
+          aria-label="Limpar busca"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Filter Toggle & Counter -->
+      <button class="filter-toggle-btn" (click)="toggleFiltersCollapse()">
+        <span>🎛️ Filtros</span>
+        <span *ngIf="activeFiltersCount() > 0" class="filter-count-badge">
+          {{ activeFiltersCount() }}
+        </span>
+        <span class="chevron-icon">{{ filtersCollapsed() ? '▼' : '▲' }}</span>
       </button>
     </div>
 
-    <!-- Type Pills Filter -->
-    <div class="type-filter-wrapper">
-      <span class="filter-label">Filtrar por Tipo:</span>
-      <div class="type-pills-scroll">
-        <button 
-          class="type-pill-all" 
-          [class.active]="selectedType() === ''"
-          (click)="clearTypeFilter()"
-        >
-          Todos
+    <!-- Collapsible Filters Panel -->
+    <div class="filters-panel" [class.collapsed]="filtersCollapsed()">
+      <!-- Multi-Type Filter -->
+      <div class="filter-group">
+        <div class="filter-group-header">
+          <span class="filter-label">🏷️ Tipos (Até 2 simultâneos):</span>
+          <span class="filter-subtext" *ngIf="selectedTypes().length > 0">
+            {{ selectedTypes().length }}/2 selecionados
+          </span>
+        </div>
+        <div class="type-pills-wrap">
+          <button 
+            *ngFor="let t of availableTypes()" 
+            class="type-pill" 
+            [ngClass]="['type-' + t, selectedTypes().includes(t) ? 'active' : '']"
+            (click)="toggleTypeFilter(t)"
+          >
+            {{ t }}
+            <span *ngIf="selectedTypes().includes(t)" class="check-icon">✓</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Multi-Gen Filter -->
+      <div class="filter-group">
+        <div class="filter-group-header">
+          <span class="filter-label">🌍 Gerações (Gens 1 a 9):</span>
+        </div>
+        <div class="gen-pills-wrap">
+          <button 
+            *ngFor="let g of availableGens" 
+            class="gen-pill" 
+            [class.active]="selectedGens().includes(g)"
+            (click)="toggleGenFilter(g)"
+          >
+            Gen {{ g }}
+            <span *ngIf="selectedGens().includes(g)" class="check-icon">✓</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Reset All Filters Button -->
+      <div *ngIf="activeFiltersCount() > 0" class="filters-footer">
+        <button class="clear-all-btn" (click)="clearAllFilters()">
+          🗑️ Limpar Todos os Filtros
         </button>
-        <button 
-          *ngFor="let t of availableTypes()" 
-          class="type-pill" 
-          [ngClass]="['type-' + t, selectedType() === t ? 'active' : '']"
-          (click)="filterByType(t)"
-        >
+      </div>
+    </div>
+
+    <!-- Active Filters Summary Line -->
+    <div class="status-summary-bar">
+      <span class="total-badge">
+        Encontrados: <strong>{{ totalCount() }}</strong> Pokémon
+      </span>
+
+      <div class="active-chips" *ngIf="activeFiltersCount() > 0">
+        <span *ngIf="searchQuery()" class="chip search-chip">
+          Search: "{{ searchQuery() }}"
+        </span>
+        <span *ngFor="let t of selectedTypes()" class="chip type-chip" [ngClass]="'type-' + t">
           {{ t }}
-        </button>
+        </span>
+        <span *ngFor="let g of selectedGens()" class="chip gen-chip">
+          Gen {{ g }}
+        </span>
       </div>
     </div>
   </section>
@@ -50,32 +108,32 @@
   <section class="grid-section">
     <!-- Initial Loading Skeletons -->
     <div *ngIf="loading()" class="pokemon-grid">
-      <div *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12]" class="skeleton-card skeleton"></div>
+      <div *ngFor="let i of [1,2,3,4,5,6,7,8]" class="skeleton-card skeleton"></div>
     </div>
 
     <!-- Empty State -->
-    <div *ngIf="!loading() && filteredPokemon().length === 0" class="empty-state">
+    <div *ngIf="!loading() && pokemonList().length === 0" class="empty-state">
       <div class="empty-icon">🔍</div>
       <h3>Nenhum Pokémon encontrado</h3>
-      <p>Tente ajustar o termo de busca ou selecione outro tipo.</p>
-      <button class="reset-btn" (click)="clearTypeFilter(); onSearchInput('')">Resetar Filtros</button>
+      <p>Tente ajustar a busca ou desmarcar alguns filtros de tipo/geração.</p>
+      <button class="reset-btn" (click)="clearAllFilters()">Resetar Filtros</button>
     </div>
 
     <!-- Loaded Cards Grid -->
-    <div *ngIf="!loading() && filteredPokemon().length > 0" class="pokemon-grid">
+    <div *ngIf="!loading() && pokemonList().length > 0" class="pokemon-grid">
       <app-pokemon-card 
-        *ngFor="let p of filteredPokemon()" 
+        *ngFor="let p of pokemonList()" 
         [pokemon]="p"
         (cardClick)="openPokemonDetail($event)"
       ></app-pokemon-card>
     </div>
 
-    <!-- Load More Button -->
-    <div *ngIf="!loading() && hasMore() && !selectedType() && !searchQuery()" class="load-more-container">
-      <button class="load-more-btn" [disabled]="loadingMore()" (click)="loadMore()">
-        <span *ngIf="!loadingMore()">Carregar Mais Pokémon</span>
-        <span *ngIf="loadingMore()" class="spinner-inline">Carregando...</span>
-      </button>
+    <!-- Sentinel Element for Infinite Scroll -->
+    <div #scrollSentinel class="scroll-sentinel">
+      <div *ngIf="loadingMore()" class="infinite-loading-indicator">
+        <div class="pokeball-spinner"></div>
+        <span>Carregando mais Pokémon...</span>
+      </div>
     </div>
   </section>
 

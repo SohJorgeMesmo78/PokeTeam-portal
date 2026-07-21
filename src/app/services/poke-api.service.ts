@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, forkJoin, map, of, catchError } from 'rxjs';
 import {
   PokemonDetail,
@@ -8,7 +8,7 @@ import {
   TypeListResponse
 } from '../models/pokemon.model';
 
-interface ApiPokemonListResponse {
+export interface ApiPokemonListResponse {
   data: PokemonDetail[];
   total: number;
   offset: number;
@@ -25,10 +25,39 @@ export class PokeApiService {
   private baseUrl = 'http://localhost:3000/api';
 
   /**
-   * Get paginated list of Pokémon from local PokeTeam API.
+   * Fetch Pokémon list with filters (search, multi-type, multi-gen, pagination).
+   */
+  getPokemonsWithFilters(
+    offset: number = 0,
+    limit: number = 24,
+    search: string = '',
+    types: string[] = [],
+    gens: number[] = []
+  ): Observable<ApiPokemonListResponse> {
+    let params = new HttpParams()
+      .set('offset', offset.toString())
+      .set('limit', limit.toString());
+
+    if (search.trim()) {
+      params = params.set('search', search.trim());
+    }
+
+    if (types.length > 0) {
+      params = params.set('types', types.join(','));
+    }
+
+    if (gens.length > 0) {
+      params = params.set('gens', gens.join(','));
+    }
+
+    return this.http.get<ApiPokemonListResponse>(`${this.baseUrl}/pokemons`, { params });
+  }
+
+  /**
+   * Legacy wrapper for paginated list.
    */
   getPokemonList(offset: number = 0, limit: number = 24): Observable<PokemonListResponse> {
-    return this.http.get<ApiPokemonListResponse>(`${this.baseUrl}/pokemons?offset=${offset}&limit=${limit}`).pipe(
+    return this.getPokemonsWithFilters(offset, limit).pipe(
       map(res => ({
         count: res.total,
         next: res.hasMore ? `${this.baseUrl}/pokemons?offset=${offset + limit}&limit=${limit}` : null,
