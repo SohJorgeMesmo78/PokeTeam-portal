@@ -1,0 +1,89 @@
+<div class="pokedex-container">
+  <!-- Search & Filter Controls -->
+  <section class="controls-section">
+    <div class="search-bar-wrapper">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input 
+        type="text" 
+        class="search-input" 
+        placeholder="Buscar Pokémon por nome ou nº (#0025)..." 
+        [ngModel]="searchQuery()"
+        (ngModelChange)="onSearchInput($event)"
+      />
+      <button 
+        *ngIf="searchQuery()" 
+        class="clear-search-btn" 
+        (click)="onSearchInput('')" 
+        aria-label="Limpar busca"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Type Pills Filter -->
+    <div class="type-filter-wrapper">
+      <span class="filter-label">Filtrar por Tipo:</span>
+      <div class="type-pills-scroll">
+        <button 
+          class="type-pill-all" 
+          [class.active]="selectedType() === ''"
+          (click)="clearTypeFilter()"
+        >
+          Todos
+        </button>
+        <button 
+          *ngFor="let t of availableTypes()" 
+          class="type-pill" 
+          [ngClass]="['type-' + t, selectedType() === t ? 'active' : '']"
+          (click)="filterByType(t)"
+        >
+          {{ t }}
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pokémon Grid Listing -->
+  <section class="grid-section">
+    <!-- Initial Loading Skeletons -->
+    <div *ngIf="loading()" class="pokemon-grid">
+      <div *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12]" class="skeleton-card skeleton"></div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading() && filteredPokemon().length === 0" class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h3>Nenhum Pokémon encontrado</h3>
+      <p>Tente ajustar o termo de busca ou selecione outro tipo.</p>
+      <button class="reset-btn" (click)="clearTypeFilter(); onSearchInput('')">Resetar Filtros</button>
+    </div>
+
+    <!-- Loaded Cards Grid -->
+    <div *ngIf="!loading() && filteredPokemon().length > 0" class="pokemon-grid">
+      <app-pokemon-card 
+        *ngFor="let p of filteredPokemon()" 
+        [pokemon]="p"
+        (cardClick)="openPokemonDetail($event)"
+      ></app-pokemon-card>
+    </div>
+
+    <!-- Load More Button -->
+    <div *ngIf="!loading() && hasMore() && !selectedType() && !searchQuery()" class="load-more-container">
+      <button class="load-more-btn" [disabled]="loadingMore()" (click)="loadMore()">
+        <span *ngIf="!loadingMore()">Carregar Mais Pokémon</span>
+        <span *ngIf="loadingMore()" class="spinner-inline">Carregando...</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Pokemon Detail Modal -->
+  <app-pokemon-detail-modal
+    *ngIf="selectedPokemon()"
+    [pokemon]="selectedPokemon()!"
+    [species]="selectedSpecies()"
+    (closeModal)="closeModal()"
+  ></app-pokemon-detail-modal>
+</div>

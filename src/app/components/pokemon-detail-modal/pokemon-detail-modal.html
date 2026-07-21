@@ -1,0 +1,98 @@
+<div class="modal-backdrop" (click)="close()">
+  <div class="modal-card" [ngClass]="'modal-type-' + primaryType" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="close()" aria-label="Fechar modal">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <div class="modal-header-bg">
+      <div class="pokeball-bg"></div>
+    </div>
+
+    <div class="modal-body">
+      <!-- Left Column: Image & Basic Badges -->
+      <div class="modal-left">
+        <div class="artwork-container">
+          <img [src]="currentArtworkUrl" [alt]="pokemon.name" class="modal-artwork" />
+          <button 
+            class="shiny-toggle-btn" 
+            [class.active]="showShiny()"
+            (click)="toggleShiny()"
+            title="Alternar versão Shiny"
+          >
+            <span>✨ {{ showShiny() ? 'Ver Normal' : 'Ver Shiny' }}</span>
+          </button>
+        </div>
+
+        <span class="modal-id">{{ formattedId }}</span>
+        <h2 class="modal-title">{{ pokemon.name }}</h2>
+
+        <div class="type-container">
+          <span 
+            *ngFor="let t of pokemon.types" 
+            class="type-badge" 
+            [ngClass]="'type-' + t.type.name"
+          >
+            {{ t.type.name }}
+          </span>
+        </div>
+
+        <!-- Physical Characteristics -->
+        <div class="physical-info-grid">
+          <div class="info-box">
+            <span class="info-label">Altura</span>
+            <span class="info-value">{{ formattedHeight }}</span>
+          </div>
+          <div class="info-box">
+            <span class="info-label">Peso</span>
+            <span class="info-value">{{ formattedWeight }}</span>
+          </div>
+          <div class="info-box">
+            <span class="info-label">Exp. Base</span>
+            <span class="info-value">{{ pokemon.base_experience || 'N/A' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Description, Abilities & Base Stats -->
+      <div class="modal-right">
+        <!-- Bio Description -->
+        <div class="section-box">
+          <h3 class="section-title">Sobre</h3>
+          <p class="description-text">{{ description }}</p>
+        </div>
+
+        <!-- Abilities -->
+        <div class="section-box">
+          <h3 class="section-title">Habilidades</h3>
+          <div class="abilities-list">
+            <span *ngFor="let a of pokemon.abilities" class="ability-pill" [class.hidden-ability]="a.is_hidden">
+              {{ a.ability.name }}
+              <small *ngIf="a.is_hidden">(Oculta)</small>
+            </span>
+          </div>
+        </div>
+
+        <!-- Base Stats -->
+        <div class="section-box">
+          <h3 class="section-title">Estatísticas Base</h3>
+          <div class="stats-list">
+            <div *ngFor="let s of pokemon.stats" class="stat-row">
+              <span class="stat-name">{{ getStatName(s.stat.name) }}</span>
+              <span class="stat-value">{{ s.base_stat }}</span>
+              <div class="stat-bar-bg">
+                <div 
+                  class="stat-bar-fill" 
+                  [ngClass]="getStatBarClass(s.base_stat)" 
+                  [style.width.%]="getStatPercentage(s.base_stat)"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
