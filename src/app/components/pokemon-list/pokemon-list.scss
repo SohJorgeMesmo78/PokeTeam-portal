@@ -203,8 +203,8 @@
 }
 
 .load-more-btn {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: #ffffff;
+  background: linear-gradient(135deg, #FFAA00, #E69900);
+  color: #121214;
   border: none;
   padding: 0.85rem 2.5rem;
   border-radius: 9999px;
@@ -212,12 +212,12 @@
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.35);
+  box-shadow: 0 8px 20px rgba(255, 170, 0, 0.35);
   transition: all 0.25s ease;
 
   &:hover:not(:disabled) {
     transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 12px 25px rgba(239, 68, 68, 0.5);
+    box-shadow: 0 12px 25px rgba(255, 170, 0, 0.5);
   }
 
   &:disabled {

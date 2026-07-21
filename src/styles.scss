@@ -4,26 +4,30 @@
   --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  /* Color Palette */
-  --bg-primary: #0b0f19;
-  --bg-secondary: #131b2e;
-  --bg-card: rgba(22, 31, 53, 0.75);
-  --bg-card-hover: rgba(30, 43, 72, 0.9);
-  --bg-modal: #151d30;
+  /* Ultra Ball Color Palette */
+  --ultraball-yellow: #FFAA00;
+  --ultraball-black: #121214;
+  --ultraball-white: #FFFFFF;
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --bg-primary: #0a0a0c;
+  --bg-secondary: #141418;
+  --bg-card: rgba(22, 22, 28, 0.85);
+  --bg-card-hover: rgba(34, 34, 44, 0.95);
+  --bg-modal: #16161c;
 
-  --accent-color: #ef4444;
-  --accent-glow: rgba(239, 68, 68, 0.4);
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+
+  --accent-color: #FFAA00;
+  --accent-glow: rgba(255, 170, 0, 0.35);
 
   --border-color: rgba(255, 255, 255, 0.08);
-  --border-highlight: rgba(255, 255, 255, 0.18);
+  --border-highlight: rgba(255, 170, 0, 0.3);
 
-  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 20px 35px -10px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 20px 35px -10px rgba(0, 0, 0, 0.8);
 
   /* Element Type Colors */
   --type-normal: #A8A77A;
@@ -61,8 +65,8 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background-image: 
-    radial-gradient(circle at 10% 20%, rgba(239, 68, 68, 0.06) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.06) 0%, transparent 40%);
+    radial-gradient(circle at 10% 15%, rgba(255, 170, 0, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 90% 85%, rgba(255, 255, 255, 0.04) 0%, transparent 45%);
   background-attachment: fixed;
 }
 
@@ -79,11 +83,11 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--bg-primary);
 }
 ::-webkit-scrollbar-thumb {
-  background: #23304b;
+  background: #272730;
   border-radius: 5px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334468;
+  background: var(--accent-color);
 }
 
 /* Helper Badge Classes */
@@ -130,7 +134,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .skeleton {
-  background: linear-gradient(90deg, #162035 25%, #22304f 50%, #162035 75%);
+  background: linear-gradient(90deg, #16161c 25%, #252530 50%, #16161c 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite ease-in-out;
   border-radius: 8px;

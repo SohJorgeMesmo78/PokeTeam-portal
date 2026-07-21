@@ -1,26 +1,45 @@
 <header class="app-header">
   <div class="header-content">
-    <div class="brand-logo">
-      <div class="pokeball-icon">
-        <div class="pokeball-top"></div>
-        <div class="pokeball-center"></div>
+    <div class="brand-logo" routerLink="/pokedex">
+      <!-- Ultra Ball Icon -->
+      <div class="ultraball-icon">
+        <div class="ultraball-top">
+          <div class="yellow-stripe left"></div>
+          <div class="yellow-stripe right"></div>
+        </div>
+        <div class="ultraball-center"></div>
       </div>
       <div class="brand-text">
         <h1>Poké<span>Team</span></h1>
-        <span class="sub-title">Pokédex Explorer</span>
+        <span class="sub-title">Ultra Ball Edition</span>
       </div>
     </div>
     
+    <nav class="main-nav">
+      <a routerLink="/pokedex" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">📖</span>
+        <span class="nav-label">Pokédex</span>
+      </a>
+      <a routerLink="/team-builder" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">🛡️</span>
+        <span class="nav-label">Montar Times</span>
+      </a>
+      <a routerLink="/game-versions" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">🎮</span>
+        <span class="nav-label">Versões & Exclusivos</span>
+      </a>
+    </nav>
+
     <div class="header-badges">
-      <span class="api-badge">Powered by PokeTeam API (PostgreSQL)</span>
+      <span class="api-badge">PokéTeam API</span>
     </div>
   </div>
 </header>
 
 <main class="main-content">
-  <app-pokemon-list></app-pokemon-list>
+  <router-outlet></router-outlet>
 </main>
 
 <footer class="app-footer">
-  <p>© 2026 PokéTeam Portal • Dados fornecidos por PokéTeam API & PostgreSQL</p>
+  <p>© 2026 PokéTeam Portal • Desenvolvido com Ultra Ball Design & PokéTeam API</p>
 </footer>
