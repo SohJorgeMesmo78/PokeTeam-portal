@@ -101,16 +101,20 @@ export class PokemonFullDetailComponent implements OnInit {
 
   getCategoryLabel(category: string): string {
     const cat = (category || 'status').toLowerCase();
-    if (cat === 'physical') return 'Physical';
-    if (cat === 'special') return 'Special';
+    if (cat.includes('physical') || cat.includes('físico')) return 'Físico';
+    if (cat.includes('special') || cat.includes('especial')) return 'Especial';
     return 'Status';
   }
 
-  getCategoryIcon(category: string): string {
+  getCategoryIconClass(category: string): string {
     const cat = (category || 'status').toLowerCase();
-    if (cat === 'physical') return '💥';
-    if (cat === 'special') return '🔮';
-    return '🛡️';
+    if (cat.includes('physical') || cat.includes('físico')) return 'ph-bold ph-lightning';
+    if (cat.includes('special') || cat.includes('especial')) return 'ph-bold ph-sparkle';
+    return 'ph-bold ph-shield-check';
+  }
+
+  getCategoryIcon(category: string): string {
+    return this.getCategoryLabel(category);
   }
 
   get currentSprite(): string {

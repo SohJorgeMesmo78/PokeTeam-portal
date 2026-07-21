@@ -2,7 +2,8 @@
   <!-- Back Navigation Button -->
   <div class="top-nav-bar">
     <button class="back-btn" routerLink="/pokedex">
-      <span>← Voltar para a Pokédex</span>
+      <i class="ph-bold ph-arrow-left"></i>
+      <span>Voltar para a Pokédex</span>
     </button>
   </div>
 
@@ -14,7 +15,8 @@
 
   <!-- Error State -->
   <div *ngIf="error()" class="error-state">
-    <h3>⚠️ Erro ao carregar Pokémon</h3>
+    <i class="ph-bold ph-warning-circle error-icon"></i>
+    <h3>Erro ao carregar Pokémon</h3>
     <p>Não foi possível encontrar as informações solicitadas.</p>
     <button class="back-btn" routerLink="/pokedex">Voltar para a Pokédex</button>
   </div>
@@ -26,7 +28,8 @@
       <div class="sprite-box">
         <img [src]="currentSprite" [alt]="pokemon().name" class="pixel-sprite" />
         <button class="shiny-pill-btn" [class.active]="showShiny()" (click)="toggleShiny()">
-          ✨ {{ showShiny() ? 'Ver Normal' : 'Ver Shiny' }}
+          <i class="ph-bold ph-sparkle"></i>
+          <span>{{ showShiny() ? 'Ver Normal' : 'Ver Shiny' }}</span>
         </button>
       </div>
 
@@ -63,7 +66,7 @@
       <div class="left-col">
         <!-- Base Stats -->
         <div class="box-card">
-          <h3>📊 Estatísticas Base</h3>
+          <h3><i class="ph-bold ph-chart-bar-horizontal"></i> Estatísticas Base</h3>
           <div class="stats-list">
             <div *ngFor="let s of pokemon().stats" class="stat-row">
               <span class="stat-name">{{ getStatName(s.stat.name) }}</span>
@@ -82,7 +85,7 @@
         <!-- Abilities -->
         <div class="box-card">
           <div class="card-title-bar">
-            <h3>🌟 Habilidades</h3>
+            <h3><i class="ph-bold ph-star"></i> Habilidades</h3>
             <span class="click-tip">Clique para ver o efeito</span>
           </div>
           <div class="abilities-wrap">
@@ -104,7 +107,7 @@
       <div class="right-col">
         <div class="box-card moves-card">
           <div class="card-title-bar">
-            <h3>⚔️ Golpes & Ataques Aprendidos</h3>
+            <h3><i class="ph-bold ph-sword"></i> Golpes & Ataques Aprendidos</h3>
             <span class="click-tip">Clique em qualquer golpe para ver a descrição detalhada</span>
           </div>
 
@@ -115,28 +118,32 @@
               [class.active]="activeTab() === 'level'" 
               (click)="setTab('level')"
             >
-              📈 Por Nível ({{ pokemon().moves?.levelUp?.length || 0 }})
+              <i class="ph-bold ph-trend-up"></i>
+              <span>Por Nível ({{ pokemon().moves?.levelUp?.length || 0 }})</span>
             </button>
             <button 
               class="tab-btn" 
               [class.active]="activeTab() === 'tm'" 
               (click)="setTab('tm')"
             >
-              💿 Por TM ({{ pokemon().moves?.tm?.length || 0 }})
+              <i class="ph-bold ph-disc"></i>
+              <span>Por TM ({{ pokemon().moves?.tm?.length || 0 }})</span>
             </button>
             <button 
               class="tab-btn" 
               [class.active]="activeTab() === 'egg'" 
               (click)="setTab('egg')"
             >
-              🥚 Por Cruzamento ({{ pokemon().moves?.egg?.length || 0 }})
+              <i class="ph-bold ph-egg"></i>
+              <span>Por Cruzamento ({{ pokemon().moves?.egg?.length || 0 }})</span>
             </button>
             <button 
               class="tab-btn" 
               [class.active]="activeTab() === 'tutor'" 
               (click)="setTab('tutor')"
             >
-              🎓 Por Tutor ({{ pokemon().moves?.tutor?.length || 0 }})
+              <i class="ph-bold ph-student"></i>
+              <span>Por Tutor ({{ pokemon().moves?.tutor?.length || 0 }})</span>
             </button>
           </div>
 
@@ -168,7 +175,7 @@
                   </td>
                   <td>
                     <span class="cat-pill" [ngClass]="m.category || 'status'">
-                      {{ getCategoryIcon(m.category) }} {{ getCategoryLabel(m.category) }}
+                      <i [class]="getCategoryIconClass(m.category)"></i> {{ getCategoryLabel(m.category) }}
                     </span>
                   </td>
                   <td class="num-cell">{{ m.power ?? '-' }}</td>
@@ -192,7 +199,7 @@
               >
                 <div class="chip-top">
                   <span class="move-chip-title">{{ m.name }}</span>
-                  <span class="cat-icon">{{ getCategoryIcon(m.category) }}</span>
+                  <i [class]="getCategoryIconClass(m.category)"></i>
                 </div>
                 <div class="chip-bottom">
                   <span class="type-badge tiny" [ngClass]="'type-' + (m.type || 'normal')">
@@ -217,7 +224,7 @@
               >
                 <div class="chip-top">
                   <span class="move-chip-title">{{ m.name }}</span>
-                  <span class="cat-icon">{{ getCategoryIcon(m.category) }}</span>
+                  <i [class]="getCategoryIconClass(m.category)"></i>
                 </div>
                 <div class="chip-bottom">
                   <span class="type-badge tiny" [ngClass]="'type-' + (m.type || 'normal')">
@@ -242,7 +249,7 @@
               >
                 <div class="chip-top">
                   <span class="move-chip-title">{{ m.name }}</span>
-                  <span class="cat-icon">{{ getCategoryIcon(m.category) }}</span>
+                  <i [class]="getCategoryIconClass(m.category)"></i>
                 </div>
                 <div class="chip-bottom">
                   <span class="type-badge tiny" [ngClass]="'type-' + (m.type || 'normal')">
@@ -261,7 +268,7 @@
   <!-- Move Detail Modal Popup -->
   <div *ngIf="selectedMove()" class="move-modal-backdrop" (click)="closeMoveDetail()">
     <div class="move-modal-card" (click)="$event.stopPropagation()">
-      <button class="close-modal-btn" (click)="closeMoveDetail()">✕</button>
+      <button class="close-modal-btn" (click)="closeMoveDetail()"><i class="ph-bold ph-x"></i></button>
 
       <div class="move-modal-header">
         <h2 class="move-modal-title">{{ selectedMove().name }}</h2>
@@ -270,18 +277,18 @@
             {{ selectedMove().type || 'normal' }}
           </span>
           <span class="cat-pill" [ngClass]="selectedMove().category || 'status'">
-            {{ getCategoryIcon(selectedMove().category) }} {{ getCategoryLabel(selectedMove().category) }}
+            <i [class]="getCategoryIconClass(selectedMove().category)"></i> {{ getCategoryLabel(selectedMove().category) }}
           </span>
         </div>
       </div>
 
       <div class="move-stats-grid">
         <div class="m-stat-box">
-          <span class="m-label">Power</span>
+          <span class="m-label">Poder</span>
           <span class="m-val">{{ selectedMove().power ?? '-' }}</span>
         </div>
         <div class="m-stat-box">
-          <span class="m-label">Accuracy</span>
+          <span class="m-label">Precisão</span>
           <span class="m-val">{{ selectedMove().accuracy ? selectedMove().accuracy + '%' : '-' }}</span>
         </div>
         <div class="m-stat-box">
@@ -300,7 +307,7 @@
   <!-- Ability Detail Modal Popup -->
   <div *ngIf="selectedAbility()" class="move-modal-backdrop" (click)="closeAbilityDetail()">
     <div class="move-modal-card" (click)="$event.stopPropagation()">
-      <button class="close-modal-btn" (click)="closeAbilityDetail()">✕</button>
+      <button class="close-modal-btn" (click)="closeAbilityDetail()"><i class="ph-bold ph-x"></i></button>
 
       <div class="move-modal-header">
         <h2 class="move-modal-title">{{ selectedAbility().ability.name }}</h2>
@@ -310,7 +317,7 @@
             [class.hidden]="selectedAbility().is_hidden" 
             [class.special]="!selectedAbility().is_hidden"
           >
-            🌟 {{ selectedAbility().is_hidden ? 'Hidden Ability' : 'Normal Ability' }}
+            <i class="ph-bold ph-star"></i> {{ selectedAbility().is_hidden ? 'Habilidade Oculta' : 'Habilidade Normal' }}
           </span>
         </div>
       </div>

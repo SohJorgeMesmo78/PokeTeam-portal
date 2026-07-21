@@ -7,7 +7,8 @@ import {
   computed,
   inject,
   ElementRef,
-  ViewChild
+  ViewChild,
+  HostListener
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -43,6 +44,9 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedGens = signal<number[]>([]);
   filtersCollapsed = signal<boolean>(false);
 
+  // Card Grid density/sizing control ('compact' = ~6/row, 'normal' = ~4/row, 'large' = ~3/row)
+  gridDensity = signal<'compact' | 'normal' | 'large'>('compact');
+
   availableTypes = signal<string[]>([]);
   readonly availableGens = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -58,6 +62,7 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
   private searchSubject = new Subject<string>();
   private searchSub?: Subscription;
   private observer?: IntersectionObserver;
+  private lastScrollY = 0;
 
   activeFiltersCount = computed(() => {
     let count = 0;
@@ -87,6 +92,19 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.searchSub?.unsubscribe();
     this.observer?.disconnect();
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    if (typeof window === 'undefined') return;
+    const currentScrollY = window.scrollY;
+    // When scrolling down past 100px, auto-collapse filters panel
+    if (currentScrollY > 100 && currentScrollY > this.lastScrollY) {
+      if (!this.filtersCollapsed()) {
+        this.filtersCollapsed.set(true);
+      }
+    }
+    this.lastScrollY = currentScrollY;
   }
 
   private setupIntersectionObserver(): void {
@@ -217,6 +235,10 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   toggleFiltersCollapse(): void {
     this.filtersCollapsed.update((val) => !val);
+  }
+
+  setGridDensity(density: 'compact' | 'normal' | 'large'): void {
+    this.gridDensity.set(density);
   }
 
   clearAllFilters(): void {

@@ -1,40 +1,32 @@
 <header class="app-header">
   <div class="header-content">
     <div class="brand-logo" routerLink="/pokedex">
-      <!-- Ultra Ball Icon -->
-      <div class="ultraball-icon">
-        <div class="ultraball-top">
-          <div class="yellow-stripe left"></div>
-          <div class="yellow-stripe right"></div>
-        </div>
-        <div class="ultraball-center"></div>
-      </div>
+      <!-- Ultra Ball Logo Image -->
+      <img src="ultraball.png" alt="PokéTeam Logo" class="brand-logo-img" />
       <div class="brand-text">
         <h1>Poké<span>Team</span></h1>
-        <span class="sub-title">Ultra Ball Edition</span>
       </div>
     </div>
     
     <nav class="main-nav">
       <a routerLink="/pokedex" routerLinkActive="active" class="nav-item">
-        <span class="nav-icon">📖</span>
+        <i class="ph-bold ph-book-open nav-icon"></i>
         <span class="nav-label">Pokédex</span>
       </a>
       <a routerLink="/team-builder" routerLinkActive="active" class="nav-item">
-        <span class="nav-icon">🛡️</span>
+        <i class="ph-bold ph-shield-chevron nav-icon"></i>
         <span class="nav-label">Montar Times</span>
       </a>
       <a routerLink="/game-versions" routerLinkActive="active" class="nav-item">
-        <span class="nav-icon">🎮</span>
+        <i class="ph-bold ph-game-controller nav-icon"></i>
         <span class="nav-label">Versões & Exclusivos</span>
       </a>
     </nav>
 
     <div class="header-badges">
       <button class="config-btn" (click)="openConfigModal()" title="Configurações de Tradução" aria-label="Configurações">
-        ⚙️
+        <i class="ph-bold ph-gear"></i>
       </button>
-      <span class="api-badge">PokéTeam API</span>
     </div>
   </div>
 </header>
@@ -47,5 +39,5 @@
 <app-config-modal *ngIf="showConfigModal" (closeModal)="closeConfigModal()"></app-config-modal>
 
 <footer class="app-footer">
-  <p>© 2026 PokéTeam Portal • Desenvolvido com Ultra Ball Design & PokéTeam API</p>
+  <p>© 2026 PokéTeam • Desenvolvido por <a href="https://jf-pereira.vercel.app/" target="_blank" rel="noopener noreferrer" class="author-link">Jorge Pereira</a></p>
 </footer>

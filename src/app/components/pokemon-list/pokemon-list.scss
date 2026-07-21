@@ -38,8 +38,7 @@
 .search-icon {
   position: absolute;
   left: 1.25rem;
-  width: 20px;
-  height: 20px;
+  font-size: 1.2rem;
   color: var(--text-muted);
   pointer-events: none;
 }
@@ -78,6 +77,9 @@
   border-radius: 50%;
   font-size: 0.8rem;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     background: rgba(255, 255, 255, 0.2);
@@ -120,8 +122,45 @@
   }
 
   .chevron-icon {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     opacity: 0.8;
+  }
+}
+
+/* Grid Density Controls (Sizing toggle) */
+.grid-density-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  padding: 0.25rem;
+  border-radius: 9999px;
+
+  .density-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    &.active {
+      background: var(--accent-color);
+      color: #121214;
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
   }
 }
 
@@ -204,8 +243,7 @@
   }
 
   .check-icon {
-    font-size: 0.75rem;
-    font-weight: 900;
+    font-size: 0.8rem;
   }
 }
 
@@ -258,6 +296,9 @@
   padding: 0.35rem 0.85rem;
   border-radius: 9999px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   transition: all 0.2s ease;
 
   &:hover {
@@ -309,14 +350,36 @@
 
 .pokemon-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.75rem;
+  gap: 1.25rem;
+
+  &.density-compact {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.25rem;
+  }
+
+  &.density-normal {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 1.5rem;
+  }
+
+  &.density-large {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+  }
 }
 
 /* Skeleton Loading Cards */
 .skeleton-card {
-  height: 380px;
+  height: 320px;
   border-radius: 20px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.03) 75%);
+  background-size: 200% 100%;
+  animation: pulseSkeleton 1.5s infinite;
+}
+
+@keyframes pulseSkeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* Empty State */
@@ -329,6 +392,7 @@
 
   .empty-icon {
     font-size: 3.5rem;
+    color: var(--accent-color);
     margin-bottom: 1rem;
   }
 
@@ -400,7 +464,7 @@
   }
 
   .pokemon-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+    gap: 1rem;
   }
 }
