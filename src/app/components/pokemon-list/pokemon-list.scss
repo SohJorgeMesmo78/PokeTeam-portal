@@ -171,7 +171,7 @@
   gap: 1.25rem;
   padding-top: 0.75rem;
   border-top: 1px dashed var(--border-color);
-  max-height: 500px;
+  max-height: 600px;
   opacity: 1;
   overflow: hidden;
   transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, padding 0.3s ease;
@@ -203,12 +203,55 @@
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  i {
+    color: var(--accent-color);
+  }
 }
 
 .filter-subtext {
   font-size: 0.75rem;
   color: var(--accent-color);
   font-weight: 600;
+}
+
+/* Game Version Pills */
+.game-pills-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.game-pill {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 170, 0, 0.1);
+    color: var(--text-primary);
+    border-color: var(--border-highlight);
+  }
+
+  &.active {
+    background: rgba(255, 170, 0, 0.25);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    font-weight: 700;
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
 }
 
 /* Multi-Type Pills */
@@ -335,6 +378,15 @@
     border-radius: 9999px;
     background: rgba(255, 255, 255, 0.08);
     color: var(--text-secondary);
+
+    &.game-chip {
+      background: rgba(255, 170, 0, 0.15);
+      border: 1px solid var(--accent-color);
+      color: var(--accent-color);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
 
     &.gen-chip {
       border: 1px solid var(--accent-color);

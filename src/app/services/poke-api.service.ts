@@ -17,6 +17,14 @@ export interface ApiPokemonListResponse {
   hasMore: boolean;
 }
 
+export interface GameVersionItem {
+  id: string;
+  name: string;
+  gen: number;
+  minId: number;
+  maxId: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -25,14 +33,16 @@ export class PokeApiService {
   private baseUrl = 'http://localhost:3000/api';
 
   /**
-   * Fetch Pokémon list with filters (search, multi-type, multi-gen, pagination).
+   * Fetch Pokémon list with filters (search, multi-type, multi-gen, game version, pagination).
    */
   getPokemonsWithFilters(
     offset: number = 0,
     limit: number = 24,
     search: string = '',
     types: string[] = [],
-    gens: number[] = []
+    gens: number[] = [],
+    game: string = '',
+    fullyEvolved: boolean = false
   ): Observable<ApiPokemonListResponse> {
     let params = new HttpParams()
       .set('offset', offset.toString())
@@ -48,6 +58,14 @@ export class PokeApiService {
 
     if (gens.length > 0) {
       params = params.set('gens', gens.join(','));
+    }
+
+    if (game.trim()) {
+      params = params.set('game', game.trim());
+    }
+
+    if (fullyEvolved) {
+      params = params.set('fullyEvolved', 'true');
     }
 
     return this.http.get<ApiPokemonListResponse>(`${this.baseUrl}/pokemons`, { params });
@@ -125,6 +143,13 @@ export class PokeApiService {
         results: types.map(name => ({ name, url: `${this.baseUrl}/types/${name}` }))
       }))
     );
+  }
+
+  /**
+   * Fetch list of all game versions.
+   */
+  getGames(): Observable<GameVersionItem[]> {
+    return this.http.get<GameVersionItem[]>(`${this.baseUrl}/games`);
   }
 
   /**

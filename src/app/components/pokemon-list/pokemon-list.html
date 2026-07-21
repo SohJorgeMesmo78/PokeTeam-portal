@@ -71,6 +71,26 @@
 
     <!-- Collapsible Filters Drawer -->
     <div class="filters-panel" [class.collapsed]="filtersCollapsed()">
+
+      <!-- Game Version Filter -->
+      <div class="filter-group">
+        <div class="filter-group-header">
+          <span class="filter-label"><i class="ph-bold ph-game-controller"></i> Jogo / Versão:</span>
+          <span class="filter-subtext">(Filtrar Pokédex por jogo oficial)</span>
+        </div>
+        <div class="game-pills-wrap">
+          <button 
+            *ngFor="let g of availableGames()" 
+            class="game-pill"
+            [class.active]="selectedGame() === g.id"
+            (click)="selectGameFilter(g.id)"
+          >
+            <span>{{ g.name }}</span>
+            <i *ngIf="selectedGame() === g.id" class="ph-bold ph-check check-icon"></i>
+          </button>
+        </div>
+      </div>
+
       <!-- Types Filter (Max 2) -->
       <div class="filter-group">
         <div class="filter-group-header">
@@ -124,6 +144,9 @@
       </span>
 
       <div *ngIf="activeFiltersCount() > 0" class="active-chips">
+        <span *ngIf="selectedGameObj()" class="chip game-chip">
+          <i class="ph-bold ph-game-controller"></i> {{ selectedGameObj()?.name }}
+        </span>
         <span *ngFor="let t of selectedTypes()" class="chip type-chip" [ngClass]="'type-' + t">
           {{ t }}
         </span>

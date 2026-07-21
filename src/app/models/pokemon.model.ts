@@ -33,6 +33,9 @@ export interface PokemonAbility {
   ability: {
     name: string;
     url: string;
+    description?: string;
+    descriptionEn?: string;
+    descriptionPt?: string;
   };
   is_hidden: boolean;
   slot: number;
@@ -65,6 +68,13 @@ export interface PokemonDetail {
   stats: PokemonStat[];
   abilities: PokemonAbility[];
   sprites: PokemonSprites;
+  spriteUrl?: string;
+  moves?: any;
+  exclusiveInfo?: {
+    isExclusive: boolean;
+    gameTag: string;
+    color: string;
+  } | null;
   species: {
     name: string;
     url: string;

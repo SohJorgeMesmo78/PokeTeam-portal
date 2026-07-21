@@ -1,0 +1,538 @@
+<div class="team-creator-container">
+  <!-- Step Navigation Indicator Bar -->
+  <div class="step-indicator-bar">
+    <div class="step-item" [class.active]="currentStep() === 1" [class.completed]="currentStep() > 1">
+      <span class="step-num">1</span>
+      <span class="step-title">Escolher Jogo</span>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step-item" [class.active]="currentStep() === 2">
+      <span class="step-num">2</span>
+      <span class="step-title">Montar Equipe</span>
+    </div>
+  </div>
+
+  <!-- STEP 1: SELEÇÃO DO JOGO -->
+  <div *ngIf="currentStep() === 1" class="step-section step-1-view">
+    <div class="section-header center">
+      <h1><i class="ph-bold ph-game-controller"></i> Selecione o jogo para montar o time</h1>
+      <p>Escolha a versão oficial do jogo para filtrar apenas a Pokédex Regional e os Pokémon disponíveis naquela versão.</p>
+    </div>
+
+    <!-- Games Grid (First option: Geral, followed by individual games) -->
+    <div class="games-grid">
+      <!-- Option 1: Geral -->
+      <div 
+        class="game-select-card geral-card" 
+        [class.selected]="selectedGame() === 'geral'"
+        (click)="selectGame('geral')"
+      >
+        <div class="card-icon"><i class="ph-bold ph-globe-hemisphere-west"></i></div>
+        <h3>Geral</h3>
+        <span class="sub">Todos os 1025 Pokémon liberados</span>
+        <i class="ph-bold ph-arrow-right arrow-icon"></i>
+      </div>
+
+      <!-- Individual Games -->
+      <div 
+        *ngFor="let g of availableGames()" 
+        class="game-select-card"
+        [class.selected]="selectedGame() === g.id"
+        (click)="selectGame(g.id)"
+      >
+        <div class="card-header-badge">Gen {{ g.gen }}</div>
+        <h3>{{ g.name }}</h3>
+        <span class="sub">Pokédex Regional {{ g.name }}</span>
+        <i class="ph-bold ph-arrow-right arrow-icon"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: MONTAGEM DA EQUIPE -->
+  <div *ngIf="currentStep() === 2" class="step-section step-2-view">
+    <!-- Top Action & Settings Bar -->
+    <div class="step2-top-bar">
+      <button class="back-step-btn" (click)="goToStep1()">
+        <i class="ph-bold ph-arrow-left"></i>
+        <span>Alterar Jogo (Voltar ao Passo 1)</span>
+      </button>
+
+      <div class="game-active-badge">
+        <i class="ph-bold ph-game-controller"></i>
+        <span>{{ getGameName(selectedGame()) }}</span>
+      </div>
+
+      <!-- Team Name Input -->
+      <div class="team-name-input-box">
+        <label><i class="ph-bold ph-pencil-simple"></i> Nome do Time:</label>
+        <input 
+          type="text" 
+          class="team-name-field" 
+          placeholder="Digite o nome do time..."
+          [ngModel]="teamNameInput()" 
+          (ngModelChange)="teamNameInput.set($event)"
+        />
+      </div>
+
+      <button class="save-team-main-btn" (click)="saveTeam()">
+        <i class="ph-bold ph-floppy-disk"></i>
+        <span>Salvar Time</span>
+      </button>
+    </div>
+
+    <!-- 6 SLOTS LAYOUT (3 Rows of 2 Rectangles Each = 2 Columns x 3 Rows Grid) -->
+    <div class="slots-3x2-grid">
+      <div *ngFor="let slotIdx of [0, 1, 2, 3, 4, 5]" class="slot-rectangle-card">
+        
+        <!-- FILLED SLOT CONTENT -->
+        <div *ngIf="teamMembers()[slotIdx]" class="slot-filled-card">
+          <div class="slot-card-header">
+            <span class="slot-badge">Slot #{{ slotIdx + 1 }}</span>
+            <button class="remove-btn" (click)="removeMemberFromSlot(slotIdx, $event)" title="Remover do Slot">
+              <i class="ph-bold ph-trash"></i>
+            </button>
+          </div>
+
+          <div class="slot-card-body">
+            <img [src]="teamMembers()[slotIdx]?.spriteUrl" [alt]="teamMembers()[slotIdx]?.pokemonName" class="pokemon-sprite" />
+            
+            <div class="pokemon-meta-col">
+              <h3 class="pokemon-display-name">
+                {{ teamMembers()[slotIdx]?.nickname || teamMembers()[slotIdx]?.pokemonName }}
+                <span *ngIf="teamMembers()[slotIdx]?.nickname && teamMembers()[slotIdx]?.nickname !== teamMembers()[slotIdx]?.pokemonName" class="species-sub">
+                  ({{ teamMembers()[slotIdx]?.pokemonName }})
+                </span>
+              </h3>
+
+              <div class="types-row">
+                <span *ngFor="let t of teamMembers()[slotIdx]?.types" class="type-badge tiny" [ngClass]="'type-' + t">
+                  {{ t }}
+                </span>
+              </div>
+
+              <div class="details-pills">
+                <span class="pill nature" [title]="getNatureDescription(teamMembers()[slotIdx]?.nature)">
+                  Nature: <strong>{{ teamMembers()[slotIdx]?.nature || 'Hardy' }}</strong>
+                </span>
+                <span class="pill ability">
+                  Habilidade: <strong>{{ teamMembers()[slotIdx]?.abilityName || 'Padrão' }}</strong>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Moves Display Row -->
+          <div class="slot-moves-bar">
+            <span class="move-chip" [class.empty]="!teamMembers()[slotIdx]?.move1">
+              {{ teamMembers()[slotIdx]?.move1 || '— Golpe 1' }}
+            </span>
+            <span class="move-chip" [class.empty]="!teamMembers()[slotIdx]?.move2">
+              {{ teamMembers()[slotIdx]?.move2 || '— Golpe 2' }}
+            </span>
+            <span class="move-chip" [class.empty]="!teamMembers()[slotIdx]?.move3">
+              {{ teamMembers()[slotIdx]?.move3 || '— Golpe 3' }}
+            </span>
+            <span class="move-chip" [class.empty]="!teamMembers()[slotIdx]?.move4">
+              {{ teamMembers()[slotIdx]?.move4 || '— Golpe 4' }}
+            </span>
+          </div>
+
+          <!-- Customize Button -->
+          <button class="customize-slot-btn" (click)="openCustomizeModal(slotIdx, $event)">
+            <i class="ph-bold ph-sliders"></i>
+            <span>Personalizar (Apelido, Nature, Habilidade & Golpes)</span>
+          </button>
+        </div>
+
+        <!-- EMPTY SLOT CONTENT -->
+        <div *ngIf="!teamMembers()[slotIdx]" class="slot-empty-card">
+          <span class="slot-badge">Slot #{{ slotIdx + 1 }}</span>
+          <div class="empty-info">
+            <i class="ph-bold ph-plus-circle empty-icon"></i>
+            <span>Espaço Vazio</span>
+            <small>Selecione um Pokémon na lista abaixo para adicionar a este slot</small>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- AVAILABLE POKÉMON LIST SECTION WITH FILTERS & PAGINATION -->
+    <div class="available-section-card">
+      <div class="available-header-box">
+        <div class="avail-title">
+          <h2><i class="ph-bold ph-list-plus"></i> Pokémon Disponíveis para Escolha</h2>
+          <span class="avail-sub">
+            Exibindo Pokédex Regional de <strong>{{ getGameName(selectedGame()) }}</strong> (Exclusivos opostos removidos)
+          </span>
+        </div>
+
+        <!-- Filters Control Bar -->
+        <div class="avail-filters-controls">
+          <!-- Search Input -->
+          <div class="avail-search-bar">
+            <i class="ph-bold ph-magnifying-glass search-icon"></i>
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="Buscar Pokémon..."
+              [ngModel]="searchQuery()" 
+              (ngModelChange)="onSearchChange($event)"
+            />
+          </div>
+
+          <!-- Type Select Dropdown -->
+          <select 
+            class="type-select-dropdown" 
+            [ngModel]="selectedType()" 
+            (ngModelChange)="onTypeFilterChange($event)"
+          >
+            <option value="">Todos os Tipos</option>
+            <option *ngFor="let t of pokemonTypesList" [value]="t">
+              Tipo: {{ t | titlecase }}
+            </option>
+          </select>
+
+          <!-- Fully Evolved Filter Toggle Checkbox -->
+          <label class="fully-evolved-toggle" (click)="toggleFullyEvolvedFilter()">
+            <input type="checkbox" [checked]="fullyEvolvedOnly()" readonly />
+            <span><i class="ph-bold ph-crown"></i> Apenas última evolução</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loadingAvailable() && availablePokemons().length === 0" class="avail-loading">
+        <div class="pokeball-spinner"></div>
+        <span>Carregando Pokémon...</span>
+      </div>
+
+      <!-- Available Cards Grid -->
+      <div *ngIf="availablePokemons().length > 0" class="available-grid">
+        <div 
+          *ngFor="let p of availablePokemons()" 
+          class="avail-pokemon-card" 
+          (click)="onSelectPokemonFromList(p)"
+        >
+          <img [src]="getPokemonSpriteUrl(p)" [alt]="p.name" class="avail-sprite" />
+          <span class="avail-id">#{{ p.id.toString().padStart(4, '0') }}</span>
+          <h4 class="avail-name">{{ p.name }}</h4>
+          <div class="avail-types">
+            <span *ngFor="let t of p.types" class="type-badge tiny" [ngClass]="'type-' + t.type.name">{{ t.type.name }}</span>
+          </div>
+          <button class="add-to-team-btn">
+            <i class="ph-bold ph-plus"></i> Escolher
+          </button>
+        </div>
+      </div>
+
+      <!-- Load More Button -->
+      <div *ngIf="hasMoreAvailable() && availablePokemons().length > 0" class="load-more-box">
+        <button class="load-more-btn" (click)="loadMoreAvailable()" [disabled]="loadingAvailable()">
+          <span *ngIf="!loadingAvailable()">Carregar Mais Pokémon</span>
+          <span *ngIf="loadingAvailable()">Carregando...</span>
+        </button>
+      </div>
+
+      <!-- Empty Search State -->
+      <div *ngIf="!loadingAvailable() && availablePokemons().length === 0" class="avail-empty">
+        <i class="ph-bold ph-ghost"></i>
+        <p>Nenhum Pokémon encontrado com os filtros selecionados.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 1: SLOT SELECTION MODAL -->
+  <div *ngIf="showSlotSelectModal()" class="modal-backdrop" (click)="closeSlotSelectModal()">
+    <div class="modal-card slot-select-modal" (click)="$event.stopPropagation()">
+      <button class="close-modal-btn" (click)="closeSlotSelectModal()"><i class="ph-bold ph-x"></i></button>
+
+      <div class="modal-header center">
+        <h2>Selecione o Slot para {{ pendingPokemon()?.name }}</h2>
+        <p>Escolha em qual dos 6 retângulos da sua equipe deseja colocar este Pokémon.</p>
+      </div>
+
+      <div class="slots-choice-grid">
+        <div 
+          *ngFor="let slotIdx of [0, 1, 2, 3, 4, 5]" 
+          class="slot-choice-card"
+          [class.occupied]="teamMembers()[slotIdx] !== null"
+          (click)="confirmSlotAssignment(slotIdx)"
+        >
+          <div class="choice-header">
+            <span class="choice-num">Slot #{{ slotIdx + 1 }}</span>
+            <span *ngIf="teamMembers()[slotIdx]" class="choice-status occupied">Ocupado</span>
+            <span *ngIf="!teamMembers()[slotIdx]" class="choice-status free">Livre</span>
+          </div>
+
+          <div *ngIf="teamMembers()[slotIdx]" class="choice-body">
+            <img [src]="teamMembers()[slotIdx]?.spriteUrl" [alt]="teamMembers()[slotIdx]?.pokemonName" class="choice-sprite" />
+            <span class="choice-name">{{ teamMembers()[slotIdx]?.nickname || teamMembers()[slotIdx]?.pokemonName }}</span>
+          </div>
+
+          <div *ngIf="!teamMembers()[slotIdx]" class="choice-body empty">
+            <i class="ph-bold ph-plus-circle"></i>
+            <span>Colocar Aqui</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: POKÉMON CUSTOMIZATION MODAL (Apelido, Nature, Cards de Habilidade e 4 Slots de Golpes) -->
+  <div *ngIf="showCustomizeModal()" class="modal-backdrop" (click)="closeCustomizeModal()">
+    <div class="modal-card customize-modal" (click)="$event.stopPropagation()">
+      <button class="close-modal-btn" (click)="closeCustomizeModal()"><i class="ph-bold ph-x"></i></button>
+
+      <div class="customize-header">
+        <img [src]="editingMember()?.spriteUrl" [alt]="editingMember()?.pokemonName" class="cust-sprite" />
+        <div>
+          <h2>Personalizar {{ editingMember()?.pokemonName }}</h2>
+          <p>Configure o apelido, a natureza, a habilidade e os 4 golpes do Pokémon.</p>
+        </div>
+      </div>
+
+      <div *ngIf="loadingMemberDetails()" class="cust-loading">
+        <div class="pokeball-spinner"></div>
+        <span>Carregando detalhes e habilidades de {{ editingMember()?.pokemonName }}...</span>
+      </div>
+
+      <div *ngIf="!loadingMemberDetails() && editingMember()" class="cust-form-grid">
+        <!-- Nickname Field -->
+        <div class="form-field">
+          <label><i class="ph-bold ph-tag"></i> Apelido (Nickname):</label>
+          <input 
+            type="text" 
+            class="text-input" 
+            placeholder="Nome do Pokémon..."
+            [(ngModel)]="editingMember()!.nickname"
+          />
+        </div>
+
+        <!-- Nature Field -->
+        <div class="form-field">
+          <label><i class="ph-bold ph-compass"></i> Natureza (Nature):</label>
+          <select class="select-input" [(ngModel)]="editingMember()!.nature">
+            <option *ngFor="let n of naturesList" [value]="n.name">
+              {{ n.namePt }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Ability Cards Grid Selection -->
+        <div class="form-field full-width">
+          <label><i class="ph-bold ph-star"></i> Escolha a Habilidade (com Descrição):</label>
+          <div class="abilities-cards-grid">
+            <div 
+              *ngFor="let a of inspectingPokemonDetails()?.abilities" 
+              class="ability-card-item"
+              [class.selected]="editingMember()?.abilityName === a.ability.name"
+              (click)="selectAbility(a.ability.name)"
+            >
+              <div class="ab-card-header">
+                <span class="ab-name">{{ a.ability.name }}</span>
+                <span class="ab-tag" [class.hidden]="a.is_hidden">
+                  {{ a.is_hidden ? 'Habilidade Oculta' : 'Normal' }}
+                </span>
+                <i *ngIf="editingMember()?.abilityName === a.ability.name" class="ph-bold ph-check-circle check-icon"></i>
+              </div>
+              <p class="ab-desc">{{ a.ability.descriptionPt || a.ability.descriptionEn || 'Sem descrição' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Moves Buttons (Opens Moves Picker Modal) -->
+        <div class="form-field full-width">
+          <label><i class="ph-bold ph-sword"></i> 4 Golpes da Equipe (Clique para escolher):</label>
+          
+          <div class="moves-interactive-slots-grid">
+            <!-- Move Slot 1 -->
+            <div class="move-slot-picker-btn" (click)="openMovePicker(0)">
+              <span class="m-slot-title">Golpe 1</span>
+              <span class="m-slot-val" [class.empty]="!editingMember()?.move1">
+                {{ editingMember()?.move1 || '+ Escolher Golpe 1' }}
+              </span>
+              <button *ngIf="editingMember()?.move1" class="clear-m-btn" (click)="clearMoveSlot(0, $event)" title="Limpar Golpe">
+                <i class="ph-bold ph-x"></i>
+              </button>
+            </div>
+
+            <!-- Move Slot 2 -->
+            <div class="move-slot-picker-btn" (click)="openMovePicker(1)">
+              <span class="m-slot-title">Golpe 2</span>
+              <span class="m-slot-val" [class.empty]="!editingMember()?.move2">
+                {{ editingMember()?.move2 || '+ Escolher Golpe 2' }}
+              </span>
+              <button *ngIf="editingMember()?.move2" class="clear-m-btn" (click)="clearMoveSlot(1, $event)" title="Limpar Golpe">
+                <i class="ph-bold ph-x"></i>
+              </button>
+            </div>
+
+            <!-- Move Slot 3 -->
+            <div class="move-slot-picker-btn" (click)="openMovePicker(2)">
+              <span class="m-slot-title">Golpe 3</span>
+              <span class="m-slot-val" [class.empty]="!editingMember()?.move3">
+                {{ editingMember()?.move3 || '+ Escolher Golpe 3' }}
+              </span>
+              <button *ngIf="editingMember()?.move3" class="clear-m-btn" (click)="clearMoveSlot(2, $event)" title="Limpar Golpe">
+                <i class="ph-bold ph-x"></i>
+              </button>
+            </div>
+
+            <!-- Move Slot 4 -->
+            <div class="move-slot-picker-btn" (click)="openMovePicker(3)">
+              <span class="m-slot-title">Golpe 4</span>
+              <span class="m-slot-val" [class.empty]="!editingMember()?.move4">
+                {{ editingMember()?.move4 || '+ Escolher Golpe 4' }}
+              </span>
+              <button *ngIf="editingMember()?.move4" class="clear-m-btn" (click)="clearMoveSlot(3, $event)" title="Limpar Golpe">
+                <i class="ph-bold ph-x"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="cancel-btn" (click)="closeCustomizeModal()">Cancelar</button>
+        <button class="save-btn" (click)="saveCustomizedMember()">
+          <i class="ph-bold ph-check"></i> Confirmar Alterações
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: MOVES PICKER MODAL (Com Abas Nível, TM, Ovos, Tutor & Pré-Visualização de Detalhes) -->
+  <div *ngIf="showMovePickerModal()" class="modal-backdrop picker-backdrop" (click)="closeMovePickerModal()">
+    <div class="modal-card moves-picker-modal" (click)="$event.stopPropagation()">
+      <button class="close-modal-btn" (click)="closeMovePickerModal()"><i class="ph-bold ph-x"></i></button>
+
+      <div class="modal-header">
+        <h2>Escolher Golpe (Slot #{{ (activeMoveSlotIndex() ?? 0) + 1 }})</h2>
+        <p>Ataques aprendidos por {{ editingMember()?.pokemonName }}</p>
+      </div>
+
+      <!-- Moves Learning Method Tabs -->
+      <div class="moves-tabs-bar">
+        <button 
+          class="tab-btn" 
+          [class.active]="movePickerTab() === 'levelUp'" 
+          (click)="movePickerTab.set('levelUp')"
+        >
+          Por Nível
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="movePickerTab() === 'tm'" 
+          (click)="movePickerTab.set('tm')"
+        >
+          Por TM / HM
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="movePickerTab() === 'egg'" 
+          (click)="movePickerTab.set('egg')"
+        >
+          Por Ovos (Egg)
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="movePickerTab() === 'tutor'" 
+          (click)="movePickerTab.set('tutor')"
+        >
+          Por Tutor
+        </button>
+      </div>
+
+      <!-- Move Search Bar Inside Modal -->
+      <div class="move-search-box">
+        <i class="ph-bold ph-magnifying-glass"></i>
+        <input 
+          type="text" 
+          class="text-input" 
+          placeholder="Buscar golpe por nome ou tipo..."
+          [ngModel]="movePickerSearch()"
+          (ngModelChange)="movePickerSearch.set($event)"
+        />
+      </div>
+
+      <!-- Split Layout: Moves Table List + Preview Detail Card -->
+      <div class="moves-picker-split-view">
+        
+        <!-- Left: Moves List -->
+        <div class="moves-list-col">
+          <div *ngIf="getFilteredMovesForTab().length === 0" class="no-moves-msg">
+            <p>Nenhum golpe encontrado nesta categoria.</p>
+          </div>
+
+          <div 
+            *ngFor="let m of getFilteredMovesForTab()" 
+            class="move-row-item"
+            [class.active]="selectedPreviewMove()?.name === m.name"
+            (click)="selectPreviewMove(m)"
+          >
+            <div class="m-left">
+              <span *ngIf="movePickerTab() === 'levelUp'" class="m-lvl">Lvl {{ m.level || 1 }}</span>
+              <span class="m-name">{{ m.name }}</span>
+            </div>
+
+            <div class="m-right">
+              <span class="type-badge tiny" [ngClass]="'type-' + (m.type || 'normal')">{{ m.type || 'normal' }}</span>
+              <span class="cat-icon" [title]="m.category">
+                <i *ngIf="m.category === 'physical'" class="ph-bold ph-sword"></i>
+                <i *ngIf="m.category === 'special'" class="ph-bold ph-sparkle"></i>
+                <i *ngIf="m.category === 'status'" class="ph-bold ph-shield-check"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Move Detail Preview Card -->
+        <div class="move-preview-col">
+          <div *ngIf="selectedPreviewMove()" class="move-preview-card">
+            <div class="prev-header">
+              <h3 class="prev-title">{{ selectedPreviewMove()?.name }}</h3>
+              <span class="type-badge" [ngClass]="'type-' + (selectedPreviewMove()?.type || 'normal')">
+                {{ selectedPreviewMove()?.type || 'normal' }}
+              </span>
+            </div>
+
+            <div class="prev-stats-row">
+              <div class="stat-pill">
+                <span class="lbl">Categoria:</span>
+                <span class="val">{{ selectedPreviewMove()?.category | titlecase }}</span>
+              </div>
+              <div class="stat-pill">
+                <span class="lbl">Poder:</span>
+                <span class="val">{{ selectedPreviewMove()?.power ?? '—' }}</span>
+              </div>
+              <div class="stat-pill">
+                <span class="lbl">Precisão:</span>
+                <span class="val">{{ selectedPreviewMove()?.accuracy ? selectedPreviewMove()?.accuracy + '%' : '—' }}</span>
+              </div>
+              <div class="stat-pill">
+                <span class="lbl">PP:</span>
+                <span class="val">{{ selectedPreviewMove()?.pp ?? '—' }}</span>
+              </div>
+            </div>
+
+            <div class="prev-desc-box">
+              <h4>Descrição do Golpe:</h4>
+              <p>{{ selectedPreviewMove()?.descriptionPt || selectedPreviewMove()?.description || 'Sem descrição.' }}</p>
+            </div>
+
+            <button class="select-this-move-btn" (click)="confirmSelectedMove()">
+              <i class="ph-bold ph-check"></i> Selecionar Golpe
+            </button>
+          </div>
+
+          <div *ngIf="!selectedPreviewMove()" class="empty-move-preview">
+            <i class="ph-bold ph-hand-pointing"></i>
+            <p>Clique em um golpe da lista ao lado para ver sua descrição e selecioná-lo.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

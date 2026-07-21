@@ -1,14 +1,99 @@
-<div class="placeholder-container">
-  <div class="ultra-card">
-    <div class="badge-tag">Em Desenvolvimento</div>
-    <div class="icon-wrapper">
-      <i class="ph-bold ph-shield-chevron icon"></i>
+<div class="team-builder-container">
+  <!-- Top Title & Navigation Bar -->
+  <div class="page-header">
+    <div class="header-titles">
+      <h1><i class="ph-bold ph-shield-check"></i> Meus Times Pokémon</h1>
+      <p>Crie, edite e personalize suas equipes para batalhas ou jogos específicos.</p>
     </div>
-    <h2>Montador de Times PokéTeam</h2>
-    <p>Em breve você poderá selecionar até 6 Pokémon, analisar a cobertura de tipos da sua equipe, fraquezas e montar o time definitivo para batalha!</p>
-    <div class="slots-preview">
-      <div class="slot" *ngFor="let i of [1,2,3,4,5,6]">
-        <span class="slot-num">#{{ i }}</span>
+
+    <button class="create-team-btn" (click)="createNewTeam()">
+      <i class="ph-bold ph-plus"></i>
+      <span>Criar Novo Time</span>
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-state">
+    <div class="pokeball-spinner"></div>
+    <p>Carregando seus times...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error()" class="error-state">
+    <i class="ph-bold ph-warning-circle error-icon"></i>
+    <p>{{ error() }}</p>
+    <button class="retry-btn" (click)="loadUserTeams()">Tentar Novamente</button>
+  </div>
+
+  <!-- Empty Teams State -->
+  <div *ngIf="!loading() && !error() && teams().length === 0" class="empty-state">
+    <i class="ph-bold ph-cards empty-icon"></i>
+    <h3>Nenhum time criado ainda</h3>
+    <p>Você ainda não possui equipes cadastradas. Clique no botão abaixo para montar seu primeiro time!</p>
+    <button class="create-team-btn" (click)="createNewTeam()">
+      <i class="ph-bold ph-plus"></i>
+      <span>Montar Primeiro Time</span>
+    </button>
+  </div>
+
+  <!-- Teams Grid -->
+  <div *ngIf="!loading() && !error() && teams().length > 0" class="teams-grid">
+    <div *ngFor="let team of teams()" class="team-card">
+      <!-- Team Card Header -->
+      <div class="team-card-header">
+        <div class="team-meta">
+          <h2 class="team-title">{{ team.name }}</h2>
+          <span class="game-tag">
+            <i class="ph-bold ph-game-controller"></i>
+            {{ getGameName(team.gameVersion) }}
+          </span>
+        </div>
+
+        <div class="team-actions">
+          <button class="action-btn edit" (click)="editTeam(team)" title="Editar Time">
+            <i class="ph-bold ph-pencil-simple"></i>
+          </button>
+          <button class="action-btn delete" (click)="deleteTeam(team)" title="Excluir Time">
+            <i class="ph-bold ph-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Team Members Horizontal Row (6 slots) -->
+      <div class="members-row">
+        <div 
+          *ngFor="let slot of [0, 1, 2, 3, 4, 5]" 
+          class="member-slot-display" 
+          [class.filled]="team.members[slot]"
+        >
+          <div *ngIf="team.members[slot]" class="member-content">
+            <img [src]="team.members[slot].spriteUrl" [alt]="team.members[slot].pokemonName" class="member-sprite" />
+            
+            <span class="member-name">
+              {{ team.members[slot].nickname || team.members[slot].pokemonName }}
+            </span>
+            
+            <div class="member-types">
+              <span *ngFor="let t of team.members[slot].types" class="type-badge tiny" [ngClass]="'type-' + t">
+                {{ t }}
+              </span>
+            </div>
+
+            <div class="member-pills">
+              <span *ngIf="team.members[slot].nature" class="pill nature-pill">
+                {{ team.members[slot].nature }}
+              </span>
+              <span *ngIf="team.members[slot].abilityName" class="pill ability-pill">
+                {{ team.members[slot].abilityName }}
+              </span>
+            </div>
+          </div>
+
+          <div *ngIf="!team.members[slot]" class="empty-slot-placeholder">
+            <i class="ph-bold ph-plus-circle"></i>
+            <span>Vazio</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>

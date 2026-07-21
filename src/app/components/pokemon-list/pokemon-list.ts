@@ -13,7 +13,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
-import { PokeApiService } from '../../services/poke-api.service';
+import { PokeApiService, GameVersionItem } from '../../services/poke-api.service';
 import { PokemonDetail, PokemonSpecies } from '../../models/pokemon.model';
 import { PokemonCardComponent } from '../pokemon-card/pokemon-card';
 import { PokemonDetailModalComponent } from '../pokemon-detail-modal/pokemon-detail-modal';
@@ -42,12 +42,14 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
   searchQuery = signal<string>('');
   selectedTypes = signal<string[]>([]);
   selectedGens = signal<number[]>([]);
+  selectedGame = signal<string>('');
   filtersCollapsed = signal<boolean>(false);
 
   // Card Grid density/sizing control ('compact' = ~6/row, 'normal' = ~4/row, 'large' = ~3/row)
   gridDensity = signal<'compact' | 'normal' | 'large'>('compact');
 
   availableTypes = signal<string[]>([]);
+  availableGames = signal<GameVersionItem[]>([]);
   readonly availableGens = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   selectedPokemon = signal<PokemonDetail | null>(null);
@@ -67,13 +69,20 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
   activeFiltersCount = computed(() => {
     let count = 0;
     if (this.searchQuery().trim()) count++;
+    if (this.selectedGame()) count++;
     count += this.selectedTypes().length;
     count += this.selectedGens().length;
     return count;
   });
 
+  selectedGameObj = computed(() => {
+    const gameId = this.selectedGame();
+    return this.availableGames().find((g) => g.id === gameId) || null;
+  });
+
   ngOnInit(): void {
     this.loadInitialTypes();
+    this.loadInitialGames();
 
     this.searchSub = this.searchSubject
       .pipe(debounceTime(350), distinctUntilChanged())
@@ -135,6 +144,14 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  loadInitialGames(): void {
+    this.pokeApiService.getGames().subscribe({
+      next: (games) => {
+        this.availableGames.set(games);
+      }
+    });
+  }
+
   resetAndFetch(): void {
     this.offset = 0;
     this.loading.set(true);
@@ -146,7 +163,8 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
         this.limit,
         this.searchQuery(),
         this.selectedTypes(),
-        this.selectedGens()
+        this.selectedGens(),
+        this.selectedGame()
       )
       .subscribe({
         next: (res) => {
@@ -174,7 +192,8 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
         this.limit,
         this.searchQuery(),
         this.selectedTypes(),
-        this.selectedGens()
+        this.selectedGens(),
+        this.selectedGame()
       )
       .subscribe({
         next: (res) => {
@@ -233,6 +252,15 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.resetAndFetch();
   }
 
+  selectGameFilter(gameId: string): void {
+    if (this.selectedGame() === gameId) {
+      this.selectedGame.set('');
+    } else {
+      this.selectedGame.set(gameId);
+    }
+    this.resetAndFetch();
+  }
+
   toggleFiltersCollapse(): void {
     this.filtersCollapsed.update((val) => !val);
   }
@@ -245,6 +273,7 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.searchQuery.set('');
     this.selectedTypes.set([]);
     this.selectedGens.set([]);
+    this.selectedGame.set('');
     this.resetAndFetch();
   }
 

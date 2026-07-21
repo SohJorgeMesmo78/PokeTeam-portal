@@ -21,6 +21,17 @@
   </div>
 
   <div class="card-body">
+    <!-- Exclusive Game Badge Overlay (Placed between number and photo) -->
+    <span 
+      *ngIf="pokemon.exclusiveInfo?.isExclusive" 
+      class="exclusive-badge" 
+      [ngClass]="'exc-' + (pokemon.exclusiveInfo?.color || 'red')"
+      [title]="pokemon.exclusiveInfo?.gameTag"
+    >
+      <i class="ph-bold ph-star"></i>
+      <span>{{ pokemon.exclusiveInfo?.gameTag }}</span>
+    </span>
+
     <div class="image-wrapper">
       <img [src]="artworkUrl" [alt]="pokemon.name" class="pokemon-img" loading="lazy" />
     </div>
