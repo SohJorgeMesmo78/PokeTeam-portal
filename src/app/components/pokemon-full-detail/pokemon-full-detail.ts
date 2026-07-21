@@ -1,7 +1,8 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { PokeApiService } from '../../services/poke-api.service';
+import { ConfiguracaoService } from '../../services/configuracao.service';
 
 @Component({
   selector: 'app-pokemon-full-detail',
@@ -13,6 +14,7 @@ import { PokeApiService } from '../../services/poke-api.service';
 export class PokemonFullDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private pokeApiService = inject(PokeApiService);
+  public configService = inject(ConfiguracaoService);
 
   pokemon = signal<any | null>(null);
   loading = signal<boolean>(true);
@@ -29,6 +31,15 @@ export class PokemonFullDetailComponent implements OnInit {
         this.fetchDetails(idOrName);
       }
     });
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.selectedMove()) {
+      this.closeMoveDetail();
+    } else if (this.selectedAbility()) {
+      this.closeAbilityDetail();
+    }
   }
 
   fetchDetails(idOrName: string): void {
@@ -71,18 +82,35 @@ export class PokemonFullDetailComponent implements OnInit {
     this.selectedAbility.set(null);
   }
 
+  getMoveDescription(move: any): string {
+    if (!move) return '';
+    if (this.configService.deveTraduzirDescricao()) {
+      return move.descriptionPt || move.descriptionEn || move.description || 'Sem descrição disponível.';
+    }
+    return move.descriptionEn || move.description || 'No description available.';
+  }
+
+  getAbilityDescription(abilityObj: any): string {
+    if (!abilityObj) return '';
+    const ab = abilityObj.ability || abilityObj;
+    if (this.configService.deveTraduzirDescricao()) {
+      return ab.descriptionPt || ab.descriptionEn || ab.description || 'Sem descrição disponível.';
+    }
+    return ab.descriptionEn || ab.description || 'No description available.';
+  }
+
   getCategoryLabel(category: string): string {
-    if (category === 'physical') return 'Físico';
-    if (category === 'special') return 'Especial';
-    if (category === 'status') return 'Status';
-    return category || 'Status';
+    const cat = (category || 'status').toLowerCase();
+    if (cat === 'physical') return 'Physical';
+    if (cat === 'special') return 'Special';
+    return 'Status';
   }
 
   getCategoryIcon(category: string): string {
-    if (category === 'physical') return '💥';
-    if (category === 'special') return '🔮';
-    if (category === 'status') return '🛡️';
-    return '⚡';
+    const cat = (category || 'status').toLowerCase();
+    if (cat === 'physical') return '💥';
+    if (cat === 'special') return '🔮';
+    return '🛡️';
   }
 
   get currentSprite(): string {

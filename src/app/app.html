@@ -31,6 +31,9 @@
     </nav>
 
     <div class="header-badges">
+      <button class="config-btn" (click)="openConfigModal()" title="Configurações de Tradução" aria-label="Configurações">
+        ⚙️
+      </button>
       <span class="api-badge">PokéTeam API</span>
     </div>
   </div>
@@ -39,6 +42,9 @@
 <main class="main-content">
   <router-outlet></router-outlet>
 </main>
+
+<!-- Modal de Configuração de Tradução -->
+<app-config-modal *ngIf="showConfigModal" (closeModal)="closeConfigModal()"></app-config-modal>
 
 <footer class="app-footer">
   <p>© 2026 PokéTeam Portal • Desenvolvido com Ultra Ball Design & PokéTeam API</p>

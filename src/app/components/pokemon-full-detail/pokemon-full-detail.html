@@ -277,11 +277,11 @@
 
       <div class="move-stats-grid">
         <div class="m-stat-box">
-          <span class="m-label">Poder</span>
+          <span class="m-label">Power</span>
           <span class="m-val">{{ selectedMove().power ?? '-' }}</span>
         </div>
         <div class="m-stat-box">
-          <span class="m-label">Precisão</span>
+          <span class="m-label">Accuracy</span>
           <span class="m-val">{{ selectedMove().accuracy ? selectedMove().accuracy + '%' : '-' }}</span>
         </div>
         <div class="m-stat-box">
@@ -291,8 +291,8 @@
       </div>
 
       <div class="move-description-box">
-        <h4>Efeito / Descrição (Inglês):</h4>
-        <p>{{ selectedMove().description || 'No description available.' }}</p>
+        <h4>Efeito / Descrição:</h4>
+        <p>{{ getMoveDescription(selectedMove()) }}</p>
       </div>
     </div>
   </div>
@@ -310,14 +310,14 @@
             [class.hidden]="selectedAbility().is_hidden" 
             [class.special]="!selectedAbility().is_hidden"
           >
-            🌟 {{ selectedAbility().is_hidden ? 'Habilidade Oculta' : 'Habilidade Normal' }}
+            🌟 {{ selectedAbility().is_hidden ? 'Hidden Ability' : 'Normal Ability' }}
           </span>
         </div>
       </div>
 
       <div class="move-description-box">
         <h4>Efeito / Descrição:</h4>
-        <p>{{ selectedAbility().ability.description || 'No description available for this ability.' }}</p>
+        <p>{{ getAbilityDescription(selectedAbility()) }}</p>
       </div>
     </div>
   </div>

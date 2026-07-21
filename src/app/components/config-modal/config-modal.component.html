@@ -1,0 +1,57 @@
+<div class="config-modal-backdrop" (click)="fechar()">
+  <div class="config-modal-card" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="config-modal-header">
+      <div class="header-title-group">
+        <span class="icon">⚙️</span>
+        <h2>Configurações de Idioma</h2>
+      </div>
+      <button class="close-btn" (click)="fechar()" aria-label="Fechar modal">✕</button>
+    </div>
+
+    <!-- Body / Toggles -->
+    <div class="config-modal-body">
+      <p class="config-subtitle">Escolha como prefere visualizar nomes, habilidades e descrições no sistema:</p>
+
+      <!-- Toggle 1: Traduzir tudo -->
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <label for="toggle-tudo" class="toggle-title">Traduzir tudo</label>
+          <span class="toggle-desc">Traduz nomes de Pokémon, ataques, tipos e habilidades para Português</span>
+        </div>
+        <label class="switch">
+          <input 
+            id="toggle-tudo" 
+            type="checkbox" 
+            [ngModel]="traduzirTudo()" 
+            (ngModelChange)="toggleTraduzirTudo($event)" 
+          />
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+      <!-- Toggle 2: Traduzir apenas descrições -->
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <label for="toggle-desc" class="toggle-title">Traduzir apenas descrições</label>
+          <span class="toggle-desc">Mantém os nomes originais em inglês e traduz somente os textos de efeito</span>
+        </div>
+        <label class="switch">
+          <input 
+            id="toggle-desc" 
+            type="checkbox" 
+            [ngModel]="traduzirDescricao()" 
+            (ngModelChange)="toggleTraduzirDescricao($event)" 
+          />
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="config-modal-footer">
+      <button type="button" class="btn-cancelar" (click)="fechar()">Cancelar</button>
+      <button type="button" class="btn-salvar" (click)="salvar()">Salvar Preferências</button>
+    </div>
+  </div>
+</div>
