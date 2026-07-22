@@ -38,7 +38,7 @@
 
   <!-- Teams Grid -->
   <div *ngIf="!loading() && !error() && teams().length > 0" class="teams-grid">
-    <div *ngFor="let team of teams()" class="team-card">
+    <div *ngFor="let team of teams()" class="team-card clickable" (click)="editTeam(team)">
       <!-- Team Card Header -->
       <div class="team-card-header">
         <div class="team-meta">
@@ -53,7 +53,7 @@
           <button class="action-btn edit" (click)="editTeam(team)" title="Editar Time">
             <i class="ph-bold ph-pencil-simple"></i>
           </button>
-          <button class="action-btn delete" (click)="deleteTeam(team)" title="Excluir Time">
+          <button class="action-btn delete" (click)="deleteTeam(team, $event)" title="Excluir Time">
             <i class="ph-bold ph-trash"></i>
           </button>
         </div>

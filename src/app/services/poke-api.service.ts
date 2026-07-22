@@ -175,4 +175,38 @@ export class PokeApiService {
   getOfficialArtworkUrl(id: number): string {
     return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
   }
+
+  /**
+   * Fetch detailed info for a single move by name.
+   */
+  getMoveDetails(moveName: string): Observable<any> {
+    const clean = moveName.trim().toLowerCase().replace(/\s+/g, '-');
+    return this.http.get<any>(`https://pokeapi.co/api/v2/move/${clean}`).pipe(
+      map(mData => {
+        const typeName = mData.type?.name || 'normal';
+        const category = mData.damage_class?.name || 'status';
+        const power = mData.power || null;
+        const pp = mData.pp || null;
+        const accuracy = mData.accuracy || null;
+
+        const flavorEntry = mData.flavor_text_entries?.find((e: any) => e.language.name === 'en');
+        const flavorText = flavorEntry ? flavorEntry.flavor_text.replace(/[\f\n\r]/g, ' ') : '';
+        const effectEntry = mData.effect_entries?.find((e: any) => e.language.name === 'en');
+        let effectText = effectEntry ? (effectEntry.effect || effectEntry.short_effect || '') : '';
+
+        return {
+          id: mData.id,
+          name: mData.name,
+          type: typeName,
+          category,
+          power,
+          pp,
+          accuracy,
+          descriptionPt: flavorText || effectText || 'Descrição detalhada do golpe.',
+          descriptionEn: flavorText || effectText || 'No description available.'
+        };
+      }),
+      catchError(() => of({ name: moveName, descriptionPt: 'Detalhes do golpe' }))
+    );
+  }
 }

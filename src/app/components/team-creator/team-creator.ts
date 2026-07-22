@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, HostListener } from '@angular/core';
+import { Component, OnInit, signal, inject, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -20,6 +20,8 @@ export class TeamCreatorComponent implements OnInit {
   private teamService = inject(TeamService);
   private pokeApiService = inject(PokeApiService);
 
+  @ViewChild('moveSearchInput') moveSearchInputRef?: ElementRef<HTMLInputElement>;
+
   currentStep = signal<number>(1); // 1 = Select Game, 2 = Build Team & Slots
   editingTeamId = signal<number | null>(null);
 
@@ -30,7 +32,7 @@ export class TeamCreatorComponent implements OnInit {
   teamNameInput = signal<string>('');
   teamMembers = signal<(TeamMemberData | null)[]>([null, null, null, null, null, null]);
 
-  // Available Pokémon list for Step 2 with Filters & Pagination
+  // Available Pokémon list for Step 2 with Filters & Infinite Scroll
   availablePokemons = signal<PokemonDetail[]>([]);
   loadingAvailable = signal<boolean>(false);
   searchQuery = signal<string>('');
@@ -50,7 +52,7 @@ export class TeamCreatorComponent implements OnInit {
   showSlotSelectModal = signal<boolean>(false);
   pendingPokemon = signal<PokemonDetail | null>(null);
 
-  // Modal 2: Pokémon Customization Modal (Nickname, Nature, Ability, 4 Moves)
+  // Modal 2: Pokémon Customization Modal (Nickname, Nature, Ability, 4 Moves, Base Stats)
   showCustomizeModal = signal<boolean>(false);
   editingSlotIndex = signal<number | null>(null);
   editingMember = signal<TeamMemberData | null>(null);
@@ -63,6 +65,11 @@ export class TeamCreatorComponent implements OnInit {
   movePickerTab = signal<string>('levelUp'); // 'levelUp', 'tm', 'egg', 'tutor'
   movePickerSearch = signal<string>('');
   selectedPreviewMove = signal<any | null>(null);
+
+  // Modal 4: Generic Info Detail Modal (For inspecting Move or Ability details on click)
+  showInfoDetailModal = signal<boolean>(false);
+  infoModalType = signal<'move' | 'ability'>('move');
+  infoModalData = signal<any | null>(null);
 
   readonly naturesList: PokemonNature[] = POKEMON_NATURES;
 
@@ -81,7 +88,9 @@ export class TeamCreatorComponent implements OnInit {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
-    if (this.showMovePickerModal()) {
+    if (this.showInfoDetailModal()) {
+      this.closeInfoDetailModal();
+    } else if (this.showMovePickerModal()) {
       this.closeMovePickerModal();
     } else if (this.showCustomizeModal()) {
       this.closeCustomizeModal();
@@ -93,7 +102,9 @@ export class TeamCreatorComponent implements OnInit {
   loadGames(): void {
     this.pokeApiService.getGames().subscribe({
       next: (games) => {
-        this.availableGames.set(games);
+        // Filter out any duplicate 'geral' entries from availableGames
+        const clean = games.filter(g => g.id !== 'geral');
+        this.availableGames.set(clean);
       }
     });
   }
@@ -156,7 +167,7 @@ export class TeamCreatorComponent implements OnInit {
     this.currentStep.set(1);
   }
 
-  // Fetch Available Pokémon with Pagination & Filters
+  // Fetch Available Pokémon with Infinite Scroll & Filters
   fetchAvailablePokemons(append: boolean = false): void {
     if (!append) {
       this.availableOffset.set(0);
@@ -193,10 +204,17 @@ export class TeamCreatorComponent implements OnInit {
       });
   }
 
-  loadMoreAvailable(): void {
-    if (this.loadingAvailable() || !this.hasMoreAvailable()) return;
-    this.availableOffset.set(this.availableOffset() + this.availableLimit);
-    this.fetchAvailablePokemons(true);
+  // Infinite Scroll Event Handler
+  onAvailableScroll(event: Event): void {
+    const element = event.target as HTMLElement;
+    if (!element) return;
+
+    if (element.scrollHeight - element.scrollTop <= element.clientHeight + 120) {
+      if (!this.loadingAvailable() && this.hasMoreAvailable()) {
+        this.availableOffset.set(this.availableOffset() + this.availableLimit);
+        this.fetchAvailablePokemons(true);
+      }
+    }
   }
 
   onSearchChange(val: string): void {
@@ -350,7 +368,42 @@ export class TeamCreatorComponent implements OnInit {
     this.editingMember.set({ ...member, abilityName });
   }
 
-  // MOVES PICKER MODAL METHODS
+  // NATURE STAT MODIFIER HELPERS (+10% Boosted Red ▲ / -10% Penalized Blue ▼)
+  getNatureStatModifier(statNameKey: string, natureName?: string | null): 'boosted' | 'penalized' | 'neutral' {
+    if (!natureName) return 'neutral';
+    const nat = this.naturesList.find(n => n.name === natureName);
+    if (!nat) return 'neutral';
+
+    const statMap: Record<string, string> = {
+      'hp': 'HP',
+      'attack': 'Ataque',
+      'defense': 'Defesa',
+      'special-attack': 'Sp. Atk',
+      'special-defense': 'Sp. Def',
+      'speed': 'Velocidade'
+    };
+
+    const label = statMap[statNameKey];
+    if (!label) return 'neutral';
+
+    if (nat.increasedStat === label) return 'boosted';
+    if (nat.decreasedStat === label) return 'penalized';
+    return 'neutral';
+  }
+
+  getStatLabelPt(statKey: string): string {
+    const map: Record<string, string> = {
+      'hp': 'HP',
+      'attack': 'Ataque',
+      'defense': 'Defesa',
+      'special-attack': 'Sp. Atk',
+      'special-defense': 'Sp. Def',
+      'speed': 'Velocidade'
+    };
+    return map[statKey] || statKey;
+  }
+
+  // MOVES PICKER MODAL METHODS WITH AUTO-FOCUS
   openMovePicker(moveSlotIndex: number): void {
     this.activeMoveSlotIndex.set(moveSlotIndex);
     this.movePickerTab.set('levelUp');
@@ -375,6 +428,11 @@ export class TeamCreatorComponent implements OnInit {
     }
 
     this.showMovePickerModal.set(true);
+
+    // Auto-focus search input inside modal
+    setTimeout(() => {
+      this.moveSearchInputRef?.nativeElement?.focus();
+    }, 120);
   }
 
   closeMovePickerModal(): void {
@@ -434,6 +492,92 @@ export class TeamCreatorComponent implements OnInit {
     }
 
     return list;
+  }
+
+  movesCache = signal<Record<string, any>>({});
+
+  registerMoveInCache(moveObj: any): void {
+    if (!moveObj || !moveObj.name) return;
+    const current = { ...this.movesCache() };
+    current[moveObj.name.toLowerCase()] = moveObj;
+    this.movesCache.set(current);
+  }
+
+  getMoveInfo(moveName?: string | null): any {
+    if (!moveName) return null;
+    const key = moveName.toLowerCase().trim();
+    if (this.movesCache()[key]) {
+      return this.movesCache()[key];
+    }
+    const details = this.inspectingPokemonDetails();
+    if (details && details.moves) {
+      const allMoves: any[] = [
+        ...(details.moves.levelUp || []),
+        ...(details.moves.tm || []),
+        ...(details.moves.egg || []),
+        ...(details.moves.tutor || [])
+      ];
+      const match = allMoves.find(m => m.name.toLowerCase() === key);
+      if (match) {
+        this.registerMoveInCache(match);
+        return match;
+      }
+    }
+    return { name: moveName, type: 'normal', category: 'status', power: null, pp: null, accuracy: null };
+  }
+
+  // GENERIC INFO DETAIL MODAL (FOR MOVE OR ABILITY CLICK IN SLOT RECTANGLES)
+  openMoveInfoModal(moveName?: string | null, event?: Event): void {
+    if (event) event.stopPropagation();
+    if (!moveName) return;
+
+    this.infoModalType.set('move');
+    const existing = this.getMoveInfo(moveName);
+
+    if (existing && existing.type && existing.category && existing.descriptionPt) {
+      this.infoModalData.set(existing);
+      this.showInfoDetailModal.set(true);
+    } else {
+      this.pokeApiService.getMoveDetails(moveName).subscribe({
+        next: (fullMove) => {
+          this.registerMoveInCache(fullMove);
+          this.infoModalData.set(fullMove);
+          this.showInfoDetailModal.set(true);
+        },
+        error: () => {
+          this.infoModalData.set({ name: moveName, descriptionPt: 'Informações do golpe' });
+          this.showInfoDetailModal.set(true);
+        }
+      });
+    }
+  }
+
+  openAbilityInfoModal(abilityName?: string | null, event?: Event): void {
+    if (event) event.stopPropagation();
+    if (!abilityName) return;
+
+    this.infoModalType.set('ability');
+    const details = this.inspectingPokemonDetails();
+    let abilityObj: any = null;
+
+    if (details && details.abilities) {
+      const match = details.abilities.find(a => a.ability.name.toLowerCase() === abilityName.toLowerCase());
+      if (match) {
+        abilityObj = {
+          name: match.ability.name,
+          is_hidden: match.is_hidden,
+          descriptionPt: match.ability.descriptionPt || match.ability.descriptionEn || match.ability.description || 'Sem descrição'
+        };
+      }
+    }
+
+    this.infoModalData.set(abilityObj || { name: abilityName, descriptionPt: 'Informações da habilidade' });
+    this.showInfoDetailModal.set(true);
+  }
+
+  closeInfoDetailModal(): void {
+    this.showInfoDetailModal.set(false);
+    this.infoModalData.set(null);
   }
 
   saveCustomizedMember(): void {

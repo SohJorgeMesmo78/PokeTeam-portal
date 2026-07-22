@@ -61,7 +61,8 @@ export class TeamBuilderComponent implements OnInit {
     }
   }
 
-  deleteTeam(team: TeamData): void {
+  deleteTeam(team: TeamData, event?: Event): void {
+    if (event) event.stopPropagation();
     if (!team.id) return;
     if (confirm(`Tem certeza de que deseja excluir o time "${team.name}"?`)) {
       this.teamService.deleteTeam(team.id).subscribe({
