@@ -17,6 +17,10 @@
         <i class="ph-bold ph-shield-chevron nav-icon"></i>
         <span class="nav-label">Montar Times</span>
       </a>
+      <a routerLink="/saved-pokemons" routerLinkActive="active" class="nav-item">
+        <i class="ph-bold ph-heart nav-icon"></i>
+        <span class="nav-label">Meus Pokémon</span>
+      </a>
       <a routerLink="/game-versions" routerLinkActive="active" class="nav-item">
         <i class="ph-bold ph-game-controller nav-icon"></i>
         <span class="nav-label">Versões & Exclusivos</span>
@@ -58,6 +62,9 @@
 
 <!-- Modal de Configuração de Tradução -->
 <app-config-modal *ngIf="showConfigModal" (closeModal)="closeConfigModal()"></app-config-modal>
+
+<!-- Toastr Floating Notifications Container -->
+<app-toast-container></app-toast-container>
 
 <footer class="app-footer">
   <p>© 2026 PokéTeam • Desenvolvido por <a href="https://jf-pereira.vercel.app/" target="_blank" rel="noopener noreferrer" class="author-link">Jorge Pereira</a></p>

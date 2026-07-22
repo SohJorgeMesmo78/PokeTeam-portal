@@ -74,16 +74,19 @@ export class AuthService {
     const token = this.loadTokenFromStorage();
     if (!token) return;
 
-    this.http.get<{ user: User }>(`${this.apiUrl}/me`, {
-      headers: { Authorization: `Bearer ${token}` }
-    }).pipe(
-      catchError(() => {
-        this.logout();
+    this.http.get<{ user: User }>(`${this.apiUrl}/me`).pipe(
+      catchError((err) => {
+        if (err && (err.status === 401 || err.status === 403)) {
+          this.logout();
+        }
         return of(null);
       })
     ).subscribe((res) => {
       if (res && res.user) {
         this._currentUser.set(res.user);
+        if (typeof window !== 'undefined' && window.localStorage) {
+          localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+        }
       }
     });
   }

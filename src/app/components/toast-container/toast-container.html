@@ -1,0 +1,23 @@
+<div class="toasts-wrapper">
+  <div 
+    *ngFor="let toast of toastService.toasts()" 
+    class="toast-card"
+    [ngClass]="'type-' + toast.type"
+  >
+    <div class="toast-icon-col">
+      <i *ngIf="toast.type === 'success'" class="ph-bold ph-check-circle"></i>
+      <i *ngIf="toast.type === 'error'" class="ph-bold ph-warning-circle"></i>
+      <i *ngIf="toast.type === 'warning'" class="ph-bold ph-warning-octagon"></i>
+      <i *ngIf="toast.type === 'info'" class="ph-bold ph-info"></i>
+    </div>
+
+    <div class="toast-content-col">
+      <h4 *ngIf="toast.title" class="toast-title">{{ toast.title }}</h4>
+      <p class="toast-message">{{ toast.message }}</p>
+    </div>
+
+    <button class="close-toast-btn" (click)="remove(toast.id)" title="Fechar">
+      <i class="ph-bold ph-x"></i>
+    </button>
+  </div>
+</div>

@@ -378,6 +378,56 @@
     </div>
   </div>
 
+  <!-- MODAL 1.5: SAVED POKÉMON PRESETS SUGGESTION MODAL -->
+  <div *ngIf="showSavedPresetModal()" class="modal-backdrop" (click)="closeSavedPresetModal()">
+    <div class="modal-card preset-modal" (click)="$event.stopPropagation()">
+      <button class="close-modal-btn" (click)="closeSavedPresetModal()"><i class="ph-bold ph-x"></i></button>
+
+      <div class="modal-header center">
+        <h2><i class="ph-bold ph-sparkle"></i> Configurações Salvas Encontradas</h2>
+        <p>Você possui <strong>{{ matchingSavedPresets().length }}</strong> versão(ões) salva(s) deste Pokémon na sua biblioteca. Deseja utilizar uma das suas preferências pré-configuradas?</p>
+      </div>
+
+      <div class="presets-grid">
+        <div *ngFor="let preset of matchingSavedPresets()" class="preset-card" (click)="applySavedPresetToSlot(preset)">
+          <div class="preset-card-top">
+            <img [src]="preset.spriteUrl" [alt]="preset.pokemonName" class="preset-sprite" />
+            <div class="preset-identity">
+              <h3 class="preset-name">{{ preset.nickname || preset.pokemonName }}</h3>
+              <span class="preset-species">({{ preset.pokemonName }})</span>
+              <div class="preset-types">
+                <span *ngFor="let t of preset.types" class="type-badge tiny" [ngClass]="'type-' + t">{{ t }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="preset-meta-pills">
+            <span class="pill">Nature: <strong>{{ preset.nature || 'Hardy' }}</strong></span>
+            <span class="pill">Habilidade: <strong>{{ preset.abilityName || 'Padrão' }}</strong></span>
+          </div>
+
+          <!-- 4 Moves Chips -->
+          <div class="preset-moves-mini">
+            <span class="m-chip" [class.empty]="!preset.move1">{{ preset.move1 || '— Golpe 1' }}</span>
+            <span class="m-chip" [class.empty]="!preset.move2">{{ preset.move2 || '— Golpe 2' }}</span>
+            <span class="m-chip" [class.empty]="!preset.move3">{{ preset.move3 || '— Golpe 3' }}</span>
+            <span class="m-chip" [class.empty]="!preset.move4">{{ preset.move4 || '— Golpe 4' }}</span>
+          </div>
+
+          <button class="apply-preset-btn">
+            <i class="ph-bold ph-check-circle"></i> Usar esta Configuração
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer space-between">
+        <button class="cancel-btn" (click)="applyDefaultToSlot()">
+          <i class="ph-bold ph-pencil-simple"></i> Não usar nenhum (Personalizar do Zero)
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL 2: POKÉMON CUSTOMIZATION MODAL (Apelido, Nature, Stats com Indicadores Red ▲ / Blue ▼) -->
   <div *ngIf="showCustomizeModal()" class="modal-backdrop" (click)="closeCustomizeModal()">
     <div class="modal-card customize-modal" (click)="$event.stopPropagation()">

@@ -2,12 +2,13 @@ import { Component, HostListener, inject } from '@angular/core';
 import { RouterModule, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ConfigModalComponent } from './components/config-modal/config-modal.component';
+import { ToastContainerComponent } from './components/toast-container/toast-container';
 import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterModule, RouterOutlet, RouterLink, RouterLinkActive, ConfigModalComponent],
+  imports: [CommonModule, RouterModule, RouterOutlet, RouterLink, RouterLinkActive, ConfigModalComponent, ToastContainerComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

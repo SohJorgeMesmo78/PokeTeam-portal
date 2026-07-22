@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { TeamService, TeamData } from '../../services/team.service';
 import { PokeApiService, GameVersionItem } from '../../services/poke-api.service';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-team-builder',
@@ -17,6 +18,7 @@ export class TeamBuilderComponent implements OnInit {
   private teamService = inject(TeamService);
   private pokeApiService = inject(PokeApiService);
   public authService = inject(AuthService);
+  private toastService = inject(ToastService);
 
   teams = signal<TeamData[]>([]);
   loading = signal<boolean>(true);
@@ -67,10 +69,11 @@ export class TeamBuilderComponent implements OnInit {
     if (confirm(`Tem certeza de que deseja excluir o time "${team.name}"?`)) {
       this.teamService.deleteTeam(team.id).subscribe({
         next: () => {
+          this.toastService.success('Time excluído com sucesso!');
           this.loadUserTeams();
         },
         error: (err) => {
-          alert(err?.error?.error || 'Erro ao excluir o time.');
+          this.toastService.error(err?.error?.error || 'Erro ao excluir o time.');
         }
       });
     }
