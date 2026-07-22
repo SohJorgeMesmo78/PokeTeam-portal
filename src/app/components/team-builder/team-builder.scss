@@ -754,6 +754,10 @@
 }
 
 @media (max-width: 640px) {
+  .team-builder-container {
+    padding: 1.25rem 0.85rem 4rem 0.85rem;
+  }
+
   .members-row {
     grid-template-columns: repeat(2, 1fr);
   }

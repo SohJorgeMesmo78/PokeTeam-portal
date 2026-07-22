@@ -1612,3 +1612,31 @@
   }
 }
 
+@media (max-width: 640px) {
+  .team-creator-container {
+    padding: 1.25rem 0.85rem 4rem 0.85rem;
+  }
+
+  .modal-card {
+    padding: 1.25rem 1rem;
+    max-height: 94vh;
+  }
+
+  .games-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .slots-choice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .presets-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .preset-moves-mini {
+    grid-template-columns: 1fr;
+  }
+}
+
+
