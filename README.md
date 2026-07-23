@@ -104,4 +104,4 @@ src/app/
 
 ## 👨‍💻 Autor
 
-Desenvolvido por **[Jorge Pereira](https://jf-pereira.vercel.app/)**.
+Desenvolvido por **[Jorge Pereira](https://jfpereira.seteoito.dev/)**.
