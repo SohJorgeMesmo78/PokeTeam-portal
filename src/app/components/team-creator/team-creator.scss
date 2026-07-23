@@ -520,6 +520,22 @@
   border: 2px dashed var(--border-color);
   border-radius: 16px;
   padding: 1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:hover {
+    border-color: var(--accent-color);
+    background: rgba(255, 170, 0, 0.05);
+
+    .empty-info {
+      color: var(--accent-color);
+
+      .empty-icon {
+        color: var(--accent-color);
+        transform: scale(1.1);
+      }
+    }
+  }
 
   .slot-badge {
     font-size: 0.75rem;

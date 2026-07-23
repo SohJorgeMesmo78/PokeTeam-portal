@@ -405,7 +405,28 @@ export class SavedPokemonListComponent implements OnInit {
   }
 
   selectPreviewMove(moveItem: any): void {
+    if (this.selectedPreviewMove()?.name === moveItem.name) {
+      this.confirmSelectedMove();
+      return;
+    }
     this.selectedPreviewMove.set(moveItem);
+  }
+
+  onMoveSearchEnter(event: Event): void {
+    event.preventDefault();
+    const moves = this.getFilteredMovesForTab();
+    if (moves.length === 1 && moves[0]) {
+      this.selectedPreviewMove.set(moves[0]);
+      this.confirmSelectedMove();
+    }
+  }
+
+  onSavedPokemonSearchEnter(event: Event): void {
+    event.preventDefault();
+    const list = this.savedPokemons();
+    if (list.length === 1 && list[0]) {
+      this.editSavedPokemon(list[0]);
+    }
   }
 
   confirmSelectedMove(): void {

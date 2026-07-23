@@ -562,8 +562,36 @@ export class TeamCreatorComponent implements OnInit {
     this.selectedPreviewMove.set(null);
   }
 
+  scrollToAvailableSection(): void {
+    const element = document.querySelector('.available-section-card');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  onPokemonSearchEnter(event: Event): void {
+    event.preventDefault();
+    const available = this.availablePokemons();
+    if (available.length === 1 && available[0]) {
+      this.onSelectPokemonFromList(available[0]);
+    }
+  }
+
   selectPreviewMove(moveItem: any): void {
+    if (this.selectedPreviewMove()?.name === moveItem.name) {
+      this.confirmSelectedMove();
+      return;
+    }
     this.selectedPreviewMove.set(moveItem);
+  }
+
+  onMoveSearchEnter(event: Event): void {
+    event.preventDefault();
+    const moves = this.getFilteredMovesForTab();
+    if (moves.length === 1 && moves[0]) {
+      this.selectedPreviewMove.set(moves[0]);
+      this.confirmSelectedMove();
+    }
   }
 
   confirmSelectedMove(): void {

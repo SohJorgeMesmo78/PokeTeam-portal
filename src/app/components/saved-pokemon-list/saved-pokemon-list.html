@@ -489,6 +489,7 @@
           placeholder="Digite para buscar o golpe imediatamente..."
           [ngModel]="movePickerSearch()"
           (ngModelChange)="movePickerSearch.set($event)"
+          (keydown.enter)="onMoveSearchEnter($event)"
         />
       </div>
 

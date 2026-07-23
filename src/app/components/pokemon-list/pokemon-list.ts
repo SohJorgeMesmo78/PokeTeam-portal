@@ -221,6 +221,14 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.searchSubject.next(value);
   }
 
+  onSearchEnter(event: Event): void {
+    event.preventDefault();
+    const list = this.pokemonList();
+    if (list.length === 1 && list[0]) {
+      this.openPokemonDetail(list[0]);
+    }
+  }
+
   toggleTypeFilter(type: string): void {
     const current = [...this.selectedTypes()];
     const index = current.indexOf(type);

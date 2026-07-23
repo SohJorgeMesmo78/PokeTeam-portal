@@ -11,6 +11,7 @@
           placeholder="Pesquisar por nome ou ID..."
           [ngModel]="searchQuery()" 
           (ngModelChange)="onSearchInputChange($event)"
+          (keydown.enter)="onSearchEnter($event)"
         />
         <button 
           *ngIf="searchQuery()" 

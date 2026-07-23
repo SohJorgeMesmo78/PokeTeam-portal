@@ -243,12 +243,12 @@
         </div>
 
         <!-- EMPTY SLOT CONTENT -->
-        <div *ngIf="!teamMembers()[slotIdx]" class="slot-empty-card">
+        <div *ngIf="!teamMembers()[slotIdx]" class="slot-empty-card" (click)="scrollToAvailableSection()">
           <span class="slot-badge">Slot #{{ slotIdx + 1 }}</span>
           <div class="empty-info">
             <i class="ph-bold ph-plus-circle empty-icon"></i>
             <span>Espaço Vazio</span>
-            <small>Selecione um Pokémon na lista abaixo para adicionar a este slot</small>
+            <small>Clique aqui para ir à lista de Pokémon disponíveis</small>
           </div>
         </div>
 
@@ -276,6 +276,7 @@
               placeholder="Buscar Pokémon..."
               [ngModel]="searchQuery()" 
               (ngModelChange)="onSearchChange($event)"
+              (keydown.enter)="onPokemonSearchEnter($event)"
             />
           </div>
 
@@ -645,6 +646,7 @@
           placeholder="Digite para buscar o golpe imediatamente..."
           [ngModel]="movePickerSearch()"
           (ngModelChange)="movePickerSearch.set($event)"
+          (keydown.enter)="onMoveSearchEnter($event)"
         />
       </div>
 
