@@ -8,6 +8,8 @@ import {
   TypeListResponse
 } from '../models/pokemon.model';
 
+import { environment } from '../../environments/environment';
+
 export interface ApiPokemonListResponse {
   data: PokemonDetail[];
   total: number;
@@ -30,7 +32,7 @@ export interface GameVersionItem {
 })
 export class PokeApiService {
   private http = inject(HttpClient);
-  private baseUrl = 'http://localhost:3000/api';
+  private baseUrl = environment.apiUrl;
 
   /**
    * Fetch Pokémon list with filters (search, multi-type, multi-gen, game version, pagination).

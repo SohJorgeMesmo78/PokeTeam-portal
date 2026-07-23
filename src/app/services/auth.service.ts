@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, catchError, of } from 'rxjs';
 
+import { environment } from '../../environments/environment';
+
 export interface User {
   id: number;
   username: string;
@@ -25,7 +27,7 @@ const USER_KEY = 'poketeam_auth_user';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private apiUrl = 'http://localhost:3000/api/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
 
   private _currentUser = signal<User | null>(this.loadUserFromStorage());
   private _token = signal<string | null>(this.loadTokenFromStorage());

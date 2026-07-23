@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
+import { environment } from '../../environments/environment';
+
 export interface TeamMemberData {
   id?: number;
   slotPosition: number;
@@ -34,7 +36,7 @@ export interface TeamData {
 export class TeamService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
-  private baseUrl = 'http://localhost:3000/api/teams';
+  private baseUrl = `${environment.apiUrl}/teams`;
 
   private getAuthHeaders(): HttpHeaders {
     const token = this.authService.token();

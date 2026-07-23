@@ -2,6 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+import { environment } from '../../environments/environment';
+
 export interface SavedPokemonData {
   id?: number;
   pokemonId: number;
@@ -24,7 +26,7 @@ export interface SavedPokemonData {
 })
 export class SavedPokemonService {
   private http = inject(HttpClient);
-  private baseUrl = 'http://localhost:3000/api/saved-pokemons';
+  private baseUrl = `${environment.apiUrl}/saved-pokemons`;
 
   getSavedPokemons(): Observable<SavedPokemonData[]> {
     return this.http.get<SavedPokemonData[]>(this.baseUrl);
