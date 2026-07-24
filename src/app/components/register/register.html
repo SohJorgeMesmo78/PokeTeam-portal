@@ -1,5 +1,5 @@
 <div class="auth-page-container">
-  <div class="auth-card">
+  <div class="auth-card register-card">
     <div class="auth-header">
       <img src="ultraball.png" alt="PokéTeam Logo" class="auth-logo" />
       <h2>Criar Nova Conta</h2>
@@ -12,88 +12,111 @@
         <span>{{ errorMessage() }}</span>
       </div>
 
-      <!-- Nome de usuário -->
-      <div class="form-group">
-        <label for="reg-username">Nome de Usuário (Único)</label>
-        <div class="input-wrapper">
-          <i class="ph-bold ph-user input-icon"></i>
-          <input 
-            id="reg-username"
-            type="text" 
-            placeholder="Escolha seu nome de treinador..."
-            [ngModel]="username()" 
-            (ngModelChange)="username.set($event)"
-            name="username"
-            required 
-          />
+      <!-- CAMPOS DE TEXTO (2 por linha no PC, 1 por linha no Celular) -->
+      <!-- Linha 1: Nome de usuário & Email -->
+      <div class="form-row-grid">
+        <!-- Nome de usuário -->
+        <div class="form-group">
+          <label for="reg-username">Nome de Usuário (Único)</label>
+          <div class="input-wrapper">
+            <i class="ph-bold ph-user input-icon"></i>
+            <input id="reg-username" type="text" placeholder="Seu nome de treinador..." [ngModel]="username()"
+              (ngModelChange)="username.set($event)" name="username" required />
+          </div>
+        </div>
+
+        <!-- E-mail -->
+        <div class="form-group">
+          <label for="reg-email">E-mail (Único)</label>
+          <div class="input-wrapper">
+            <i class="ph-bold ph-envelope input-icon"></i>
+            <input id="reg-email" type="email" placeholder="seuemail@exemplo.com" [ngModel]="email()"
+              (ngModelChange)="email.set($event)" name="email" required />
+          </div>
         </div>
       </div>
 
-      <!-- E-mail -->
-      <div class="form-group">
-        <label for="reg-email">E-mail (Único)</label>
-        <div class="input-wrapper">
-          <i class="ph-bold ph-envelope input-icon"></i>
-          <input 
-            id="reg-email"
-            type="email" 
-            placeholder="seuemail@exemplo.com"
-            [ngModel]="email()" 
-            (ngModelChange)="email.set($event)"
-            name="email"
-            required 
-          />
+      <!-- Linha 2: Senha & Confirmar Senha -->
+      <div class="form-row-grid">
+        <!-- Senha -->
+        <div class="form-group">
+          <label for="reg-password">Senha Forte</label>
+          <div class="input-wrapper">
+            <i class="ph-bold ph-lock input-icon"></i>
+            <input id="reg-password" [type]="showPassword() ? 'text' : 'password'" placeholder="Crie uma senha..."
+              [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" required />
+            <button type="button" class="eye-toggle" (click)="toggleShowPassword()" title="Mostrar/ocultar senha">
+              <i class="ph-bold" [class.ph-eye]="!showPassword()" [class.ph-eye-slash]="showPassword()"></i>
+            </button>
+          </div>
         </div>
-      </div>
 
-      <!-- Senha -->
-      <div class="form-group">
-        <label for="reg-password">Senha Forte</label>
-        <div class="input-wrapper">
-          <i class="ph-bold ph-lock input-icon"></i>
-          <input 
-            id="reg-password"
-            [type]="showPassword() ? 'text' : 'password'" 
-            placeholder="Crie uma senha forte..."
-            [ngModel]="password()" 
-            (ngModelChange)="password.set($event)"
-            name="password"
-            required 
-          />
-          <button type="button" class="eye-toggle" (click)="toggleShowPassword()" title="Mostrar/ocultar senha">
-            <i class="ph-bold" [class.ph-eye]="!showPassword()" [class.ph-eye-slash]="showPassword()"></i>
-          </button>
+        <!-- Confirmar Senha -->
+        <div class="form-group">
+          <label for="reg-confirm">Confirmar Senha</label>
+          <div class="input-wrapper">
+            <i class="ph-bold ph-shield-check input-icon"></i>
+            <input id="reg-confirm" [type]="showPassword() ? 'text' : 'password'"
+              placeholder="Confirme a senha..." [ngModel]="confirmPassword()"
+              (ngModelChange)="confirmPassword.set($event)" name="confirmPassword" required />
+          </div>
+          <span *ngIf="confirmPassword() && !passwordsMatch()" class="field-error">As senhas não coincidem.</span>
         </div>
       </div>
 
       <!-- Requisitos de Senha Forte -->
       <div class="password-rules-box">
         <span class="rules-title">A senha deve conter:</span>
-        <ul class="rules-list">
-          <li [class.valid]="hasMinLength()"><i class="ph-bold" [class.ph-check]="hasMinLength()" [class.ph-x]="!hasMinLength()"></i> Mínimo de 8 caracteres</li>
-          <li [class.valid]="hasUppercase()"><i class="ph-bold" [class.ph-check]="hasUppercase()" [class.ph-x]="!hasUppercase()"></i> Pelo menos 1 letra maiúscula (A-Z)</li>
-          <li [class.valid]="hasLowercase()"><i class="ph-bold" [class.ph-check]="hasLowercase()" [class.ph-x]="!hasLowercase()"></i> Pelo menos 1 letra minúscula (a-z)</li>
-          <li [class.valid]="hasNumber()"><i class="ph-bold" [class.ph-check]="hasNumber()" [class.ph-x]="!hasNumber()"></i> Pelo menos 1 número (0-9)</li>
-          <li [class.valid]="hasSpecial()"><i class="ph-bold" [class.ph-check]="hasSpecial()" [class.ph-x]="!hasSpecial()"></i> Pelo menos 1 caractere especial (&#64;, #, $, %, etc.)</li>
+        <ul class="rules-list-grid">
+          <li [class.valid]="hasMinLength()"><i class="ph-bold" [class.ph-check]="hasMinLength()"
+              [class.ph-x]="!hasMinLength()"></i> 8+ caracteres</li>
+          <li [class.valid]="hasUppercase()"><i class="ph-bold" [class.ph-check]="hasUppercase()"
+              [class.ph-x]="!hasUppercase()"></i> Maiúscula (A-Z)</li>
+          <li [class.valid]="hasLowercase()"><i class="ph-bold" [class.ph-check]="hasLowercase()"
+              [class.ph-x]="!hasLowercase()"></i> Minúscula (a-z)</li>
+          <li [class.valid]="hasNumber()"><i class="ph-bold" [class.ph-check]="hasNumber()"
+              [class.ph-x]="!hasNumber()"></i> Número (0-9)</li>
+          <li [class.valid]="hasSpecial()"><i class="ph-bold" [class.ph-check]="hasSpecial()"
+              [class.ph-x]="!hasSpecial()"></i> Especial (&#64;, #, $)</li>
         </ul>
       </div>
 
-      <!-- Confirmar Senha -->
-      <div class="form-group">
-        <label for="reg-confirm">Confirmar Senha</label>
-        <div class="input-wrapper">
-          <i class="ph-bold ph-shield-check input-icon"></i>
-          <input 
-            id="reg-confirm"
-            [type]="showPassword() ? 'text' : 'password'" 
-            placeholder="Digite a senha novamente..."
-            [ngModel]="confirmPassword()" 
-            (ngModelChange)="confirmPassword.set($event)"
-            name="confirmPassword"
-            required 
-          />
+      <!-- SEÇÃO DE AVATAR (ABAIXO DOS INPUTS) -->
+      <div class="avatar-selection-panel">
+        <div class="panel-header">
+          <label class="section-label">Avatar do Treinador</label>
+          
+          <div class="gender-toggle-pills">
+            <button 
+              type="button" 
+              class="gender-pill" 
+              [class.active]="avatarGenderTab() === 'boy'" 
+              (click)="setGenderTab('boy')"
+            >
+              Treinador
+            </button>
+            <button 
+              type="button" 
+              class="gender-pill" 
+              [class.active]="avatarGenderTab() === 'girl'" 
+              (click)="setGenderTab('girl')"
+            >
+              Treinadora
+            </button>
+          </div>
         </div>
-        <span *ngIf="confirmPassword() && !passwordsMatch()" class="field-error">As senhas não coincidem.</span>
+
+        <!-- Selected Avatar Preview Box -->
+        <div class="selected-avatar-preview-box">
+          <img [src]="selectedAvatar()" alt="Avatar Selecionado" class="avatar-perfil preview-size selected" />
+          
+          <div class="preview-info">
+            <span class="avatar-status-text">Avatar Escolhido</span>
+            <button type="button" class="change-avatar-btn" (click)="openAvatarModal()">
+              <i class="ph-bold ph-user-focus"></i> Ver Todas as Opções
+            </button>
+          </div>
+        </div>
       </div>
 
       <button type="submit" class="auth-submit-btn" [disabled]="!isFormValid() || loading()">
@@ -106,6 +129,61 @@
 
     <div class="auth-footer">
       <p>Já possui uma conta? <a routerLink="/login" class="auth-link">Faça login</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE ESCOLHA DE AVATAR (AMPLIADO PARA MELHOR VISUALIZAÇÃO) -->
+<div *ngIf="showAvatarModal()" class="avatar-modal-overlay" (click)="closeAvatarModal()">
+  <div class="avatar-modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="ph-bold ph-user-circle"></i> Escolha seu Avatar</h3>
+      <button class="close-modal-btn" (click)="closeAvatarModal()"><i class="ph-bold ph-x"></i></button>
+    </div>
+
+    <!-- Gender Selector in Modal -->
+    <div class="modal-gender-tabs">
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="avatarGenderTab() === 'boy'" 
+        (click)="setGenderTab('boy')"
+      >
+        Treinadores
+      </button>
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="avatarGenderTab() === 'girl'" 
+        (click)="setGenderTab('girl')"
+      >
+        Treinadoras
+      </button>
+    </div>
+
+    <!-- Larger Avatar Options Grid -->
+    <div class="modal-avatar-grid">
+      <ng-container *ngIf="avatarGenderTab() === 'boy'">
+        <div 
+          *ngFor="let av of boyAvatars" 
+          class="avatar-card-item"
+          [class.active]="selectedAvatar() === av"
+          (click)="selectAvatarAndClose(av)"
+        >
+          <img [src]="av" [alt]="av" class="avatar-perfil modal-size" [class.selected]="selectedAvatar() === av" />
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="avatarGenderTab() === 'girl'">
+        <div 
+          *ngFor="let av of girlAvatars" 
+          class="avatar-card-item"
+          [class.active]="selectedAvatar() === av"
+          (click)="selectAvatarAndClose(av)"
+        >
+          <img [src]="av" [alt]="av" class="avatar-perfil modal-size" [class.selected]="selectedAvatar() === av" />
+        </div>
+      </ng-container>
     </div>
   </div>
 </div>

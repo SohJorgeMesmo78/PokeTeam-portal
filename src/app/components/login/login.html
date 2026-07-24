@@ -16,15 +16,8 @@
         <label for="login-input">E-mail ou Usuário</label>
         <div class="input-wrapper">
           <i class="ph-bold ph-user input-icon"></i>
-          <input 
-            id="login-input"
-            type="text" 
-            placeholder="Digite seu e-mail ou nome de usuário..."
-            [ngModel]="loginValue()" 
-            (ngModelChange)="loginValue.set($event)"
-            name="loginValue"
-            required 
-          />
+          <input id="login-input" type="text" placeholder="Digite seu e-mail ou nome de usuário..."
+            [ngModel]="loginValue()" (ngModelChange)="loginValue.set($event)" name="loginValue" required />
         </div>
       </div>
 
@@ -32,15 +25,8 @@
         <label for="password-input">Senha</label>
         <div class="input-wrapper">
           <i class="ph-bold ph-lock input-icon"></i>
-          <input 
-            id="password-input"
-            [type]="showPassword() ? 'text' : 'password'" 
-            placeholder="Digite sua senha..."
-            [ngModel]="password()" 
-            (ngModelChange)="password.set($event)"
-            name="password"
-            required 
-          />
+          <input id="password-input" [type]="showPassword() ? 'text' : 'password'" placeholder="Digite sua senha..."
+            [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" required />
           <button type="button" class="eye-toggle" (click)="toggleShowPassword()" title="Mostrar/ocultar senha">
             <i class="ph-bold" [class.ph-eye]="!showPassword()" [class.ph-eye-slash]="showPassword()"></i>
           </button>

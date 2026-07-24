@@ -3,7 +3,8 @@
   <div class="page-header">
     <div class="header-content">
       <h1><i class="ph-bold ph-heart"></i> Meus Pokémon Salvos</h1>
-      <p>Sua biblioteca pessoal de Pokémon pré-configurados com apelido, natureza, habilidade e golpes personalizados.</p>
+      <p>Sua biblioteca pessoal de Pokémon pré-configurados com apelido, natureza, habilidade e golpes personalizados.
+      </p>
     </div>
 
     <div class="header-actions-group">
@@ -36,7 +37,8 @@
   <div *ngIf="!loading() && !error() && savedPokemons().length === 0" class="empty-state">
     <i class="ph-bold ph-ghost"></i>
     <h2>Nenhum Pokémon salvo ainda</h2>
-    <p>Monte o seu primeiro Pokémon individual escolhendo sua natureza, habilidade e golpes para usá-lo quando quiser!</p>
+    <p>Monte o seu primeiro Pokémon individual escolhendo sua natureza, habilidade e golpes para usá-lo quando quiser!
+    </p>
     <div class="empty-actions">
       <button class="import-team-btn" (click)="openImportModal()">
         <i class="ph-bold ph-download-simple"></i> Importar de um Time
@@ -81,11 +83,8 @@
             <span class="pill nature" [title]="getNatureDescription(p.nature)">
               Nature: <strong>{{ p.nature || 'Hardy' }}</strong>
             </span>
-            <span 
-              class="pill ability clickable" 
-              (click)="openAbilityInfoModal(p.abilityName, $event)"
-              title="Clique para ver detalhes da habilidade"
-            >
+            <span class="pill ability clickable" (click)="openAbilityInfoModal(p.abilityName, $event)"
+              title="Clique para ver detalhes da habilidade">
               Habilidade: <strong>{{ p.abilityName || 'Padrão' }}</strong>
               <i class="ph-bold ph-info"></i>
             </span>
@@ -96,15 +95,12 @@
       <!-- 4 Moves Display Grid -->
       <div class="slot-moves-rich-grid">
         <!-- Move 1 -->
-        <div 
-          class="move-rich-chip" 
-          [class.empty]="!p.move1"
-          (click)="openMoveInfoModal(p.move1, $event)"
-          title="Clique para ver detalhes do golpe"
-        >
+        <div class="move-rich-chip" [class.empty]="!p.move1" (click)="openMoveInfoModal(p.move1, $event)"
+          title="Clique para ver detalhes do golpe">
           <div class="m-top">
             <span class="m-name">{{ p.move1 || '— Golpe 1' }}</span>
-            <span *ngIf="p.move1" class="type-badge micro" [ngClass]="'type-' + (getMoveInfo(p.move1)?.type || 'normal')">
+            <span *ngIf="p.move1" class="type-badge micro"
+              [ngClass]="'type-' + (getMoveInfo(p.move1)?.type || 'normal')">
               {{ getMoveInfo(p.move1)?.type || 'normal' }}
             </span>
           </div>
@@ -117,20 +113,18 @@
             </span>
             <span class="m-stat">PP: <strong>{{ getMoveInfo(p.move1)?.pp ?? '—' }}</strong></span>
             <span class="m-stat">Dano: <strong>{{ getMoveInfo(p.move1)?.power ?? '—' }}</strong></span>
-            <span class="m-stat">Acc: <strong>{{ getMoveInfo(p.move1)?.accuracy ? getMoveInfo(p.move1)?.accuracy + '%' : '—' }}</strong></span>
+            <span class="m-stat">Acc: <strong>{{ getMoveInfo(p.move1)?.accuracy ? getMoveInfo(p.move1)?.accuracy + '%' :
+                '—' }}</strong></span>
           </div>
         </div>
 
         <!-- Move 2 -->
-        <div 
-          class="move-rich-chip" 
-          [class.empty]="!p.move2"
-          (click)="openMoveInfoModal(p.move2, $event)"
-          title="Clique para ver detalhes do golpe"
-        >
+        <div class="move-rich-chip" [class.empty]="!p.move2" (click)="openMoveInfoModal(p.move2, $event)"
+          title="Clique para ver detalhes do golpe">
           <div class="m-top">
             <span class="m-name">{{ p.move2 || '— Golpe 2' }}</span>
-            <span *ngIf="p.move2" class="type-badge micro" [ngClass]="'type-' + (getMoveInfo(p.move2)?.type || 'normal')">
+            <span *ngIf="p.move2" class="type-badge micro"
+              [ngClass]="'type-' + (getMoveInfo(p.move2)?.type || 'normal')">
               {{ getMoveInfo(p.move2)?.type || 'normal' }}
             </span>
           </div>
@@ -143,20 +137,18 @@
             </span>
             <span class="m-stat">PP: <strong>{{ getMoveInfo(p.move2)?.pp ?? '—' }}</strong></span>
             <span class="m-stat">Dano: <strong>{{ getMoveInfo(p.move2)?.power ?? '—' }}</strong></span>
-            <span class="m-stat">Acc: <strong>{{ getMoveInfo(p.move2)?.accuracy ? getMoveInfo(p.move2)?.accuracy + '%' : '—' }}</strong></span>
+            <span class="m-stat">Acc: <strong>{{ getMoveInfo(p.move2)?.accuracy ? getMoveInfo(p.move2)?.accuracy + '%' :
+                '—' }}</strong></span>
           </div>
         </div>
 
         <!-- Move 3 -->
-        <div 
-          class="move-rich-chip" 
-          [class.empty]="!p.move3"
-          (click)="openMoveInfoModal(p.move3, $event)"
-          title="Clique para ver detalhes do golpe"
-        >
+        <div class="move-rich-chip" [class.empty]="!p.move3" (click)="openMoveInfoModal(p.move3, $event)"
+          title="Clique para ver detalhes do golpe">
           <div class="m-top">
             <span class="m-name">{{ p.move3 || '— Golpe 3' }}</span>
-            <span *ngIf="p.move3" class="type-badge micro" [ngClass]="'type-' + (getMoveInfo(p.move3)?.type || 'normal')">
+            <span *ngIf="p.move3" class="type-badge micro"
+              [ngClass]="'type-' + (getMoveInfo(p.move3)?.type || 'normal')">
               {{ getMoveInfo(p.move3)?.type || 'normal' }}
             </span>
           </div>
@@ -169,20 +161,18 @@
             </span>
             <span class="m-stat">PP: <strong>{{ getMoveInfo(p.move3)?.pp ?? '—' }}</strong></span>
             <span class="m-stat">Dano: <strong>{{ getMoveInfo(p.move3)?.power ?? '—' }}</strong></span>
-            <span class="m-stat">Acc: <strong>{{ getMoveInfo(p.move3)?.accuracy ? getMoveInfo(p.move3)?.accuracy + '%' : '—' }}</strong></span>
+            <span class="m-stat">Acc: <strong>{{ getMoveInfo(p.move3)?.accuracy ? getMoveInfo(p.move3)?.accuracy + '%' :
+                '—' }}</strong></span>
           </div>
         </div>
 
         <!-- Move 4 -->
-        <div 
-          class="move-rich-chip" 
-          [class.empty]="!p.move4"
-          (click)="openMoveInfoModal(p.move4, $event)"
-          title="Clique para ver detalhes do golpe"
-        >
+        <div class="move-rich-chip" [class.empty]="!p.move4" (click)="openMoveInfoModal(p.move4, $event)"
+          title="Clique para ver detalhes do golpe">
           <div class="m-top">
             <span class="m-name">{{ p.move4 || '— Golpe 4' }}</span>
-            <span *ngIf="p.move4" class="type-badge micro" [ngClass]="'type-' + (getMoveInfo(p.move4)?.type || 'normal')">
+            <span *ngIf="p.move4" class="type-badge micro"
+              [ngClass]="'type-' + (getMoveInfo(p.move4)?.type || 'normal')">
               {{ getMoveInfo(p.move4)?.type || 'normal' }}
             </span>
           </div>
@@ -195,7 +185,8 @@
             </span>
             <span class="m-stat">PP: <strong>{{ getMoveInfo(p.move4)?.pp ?? '—' }}</strong></span>
             <span class="m-stat">Dano: <strong>{{ getMoveInfo(p.move4)?.power ?? '—' }}</strong></span>
-            <span class="m-stat">Acc: <strong>{{ getMoveInfo(p.move4)?.accuracy ? getMoveInfo(p.move4)?.accuracy + '%' : '—' }}</strong></span>
+            <span class="m-stat">Acc: <strong>{{ getMoveInfo(p.move4)?.accuracy ? getMoveInfo(p.move4)?.accuracy + '%' :
+                '—' }}</strong></span>
           </div>
         </div>
       </div>
@@ -216,20 +207,11 @@
       <div class="avail-filters-controls">
         <div class="avail-search-bar">
           <i class="ph-bold ph-magnifying-glass search-icon"></i>
-          <input 
-            type="text" 
-            class="search-input" 
-            placeholder="Buscar Pokémon..."
-            [ngModel]="searchQuery()" 
-            (ngModelChange)="onSearchChange($event)"
-          />
+          <input type="text" class="search-input" placeholder="Buscar Pokémon..." [ngModel]="searchQuery()"
+            (ngModelChange)="onSearchChange($event)" />
         </div>
 
-        <select 
-          class="type-select-dropdown" 
-          [ngModel]="selectedType()" 
-          (ngModelChange)="onTypeFilterChange($event)"
-        >
+        <select class="type-select-dropdown" [ngModel]="selectedType()" (ngModelChange)="onTypeFilterChange($event)">
           <option value="">Todos os Tipos</option>
           <option *ngFor="let t of pokemonTypesList" [value]="t">
             Tipo: {{ t | titlecase }}
@@ -243,21 +225,14 @@
       </div>
 
       <!-- Available Grid -->
-      <div 
-        *ngIf="availablePokemons().length > 0" 
-        class="available-grid"
-        (scroll)="onAvailableScroll($event)"
-      >
-        <div 
-          *ngFor="let p of availablePokemons()" 
-          class="avail-pokemon-card" 
-          (click)="onSelectPokemonFromList(p)"
-        >
+      <div *ngIf="availablePokemons().length > 0" class="available-grid" (scroll)="onAvailableScroll($event)">
+        <div *ngFor="let p of availablePokemons()" class="avail-pokemon-card" (click)="onSelectPokemonFromList(p)">
           <img [src]="p.spriteUrl" [alt]="p.name" class="avail-sprite" />
           <span class="avail-id">#{{ p.id.toString().padStart(4, '0') }}</span>
           <h4 class="avail-name">{{ p.name }}</h4>
           <div class="avail-types">
-            <span *ngFor="let t of p.types" class="type-badge tiny" [ngClass]="'type-' + t.type.name">{{ t.type.name }}</span>
+            <span *ngFor="let t of p.types" class="type-badge tiny" [ngClass]="'type-' + t.type.name">{{ t.type.name
+              }}</span>
           </div>
           <button class="add-to-team-btn">
             <i class="ph-bold ph-plus"></i> Personalizar
@@ -294,12 +269,8 @@
         <!-- Nickname Field -->
         <div class="form-field">
           <label><i class="ph-bold ph-tag"></i> Apelido (Nickname):</label>
-          <input 
-            type="text" 
-            class="text-input" 
-            placeholder="Nome do Pokémon..."
-            [(ngModel)]="editingMember()!.nickname"
-          />
+          <input type="text" class="text-input" placeholder="Nome do Pokémon..."
+            [(ngModel)]="editingMember()!.nickname" />
         </div>
 
         <!-- Nature Field -->
@@ -329,35 +300,27 @@
             <div *ngFor="let st of inspectingPokemonDetails()?.stats" class="stat-row-item">
               <div class="stat-name-label">
                 <span>{{ getStatLabelPt(st.stat.name) }}</span>
-                <span 
-                  *ngIf="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'boosted'" 
-                  class="nature-modifier-chip boosted"
-                >
+                <span *ngIf="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'boosted'"
+                  class="nature-modifier-chip boosted">
                   <i class="ph-bold ph-arrow-up"></i> +10%
                 </span>
-                <span 
-                  *ngIf="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'penalized'" 
-                  class="nature-modifier-chip penalized"
-                >
+                <span *ngIf="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'penalized'"
+                  class="nature-modifier-chip penalized">
                   <i class="ph-bold ph-arrow-down"></i> -10%
                 </span>
               </div>
 
-              <span 
-                class="stat-val-num"
+              <span class="stat-val-num"
                 [class.boosted]="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'boosted'"
-                [class.penalized]="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'penalized'"
-              >
+                [class.penalized]="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'penalized'">
                 {{ st.base_stat }}
               </span>
 
               <div class="stat-bar-track">
-                <div 
-                  class="stat-bar-fill" 
-                  [style.width.%]="(st.base_stat / 255) * 100"
+                <div class="stat-bar-fill" [style.width.%]="(st.base_stat / 255) * 100"
                   [class.boosted]="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'boosted'"
-                  [class.penalized]="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'penalized'"
-                ></div>
+                  [class.penalized]="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'penalized'">
+                </div>
               </div>
             </div>
           </div>
@@ -367,18 +330,16 @@
         <div class="form-field full-width">
           <label><i class="ph-bold ph-star"></i> Escolha a Habilidade (com Descrição):</label>
           <div class="abilities-cards-grid">
-            <div 
-              *ngFor="let a of inspectingPokemonDetails()?.abilities" 
-              class="ability-card-item"
+            <div *ngFor="let a of inspectingPokemonDetails()?.abilities" class="ability-card-item"
               [class.selected]="editingMember()?.abilityName === a.ability.name"
-              (click)="selectAbility(a.ability.name)"
-            >
+              (click)="selectAbility(a.ability.name)">
               <div class="ab-card-header">
                 <span class="ab-name">{{ a.ability.name }}</span>
                 <span class="ab-tag" [class.hidden]="a.is_hidden">
                   {{ a.is_hidden ? 'Habilidade Oculta' : 'Normal' }}
                 </span>
-                <i *ngIf="editingMember()?.abilityName === a.ability.name" class="ph-bold ph-check-circle check-icon"></i>
+                <i *ngIf="editingMember()?.abilityName === a.ability.name"
+                  class="ph-bold ph-check-circle check-icon"></i>
               </div>
               <p class="ab-desc">{{ a.ability.descriptionPt || a.ability.descriptionEn || 'Sem descrição' }}</p>
             </div>
@@ -388,14 +349,15 @@
         <!-- 4 Moves Buttons -->
         <div class="form-field full-width">
           <label><i class="ph-bold ph-sword"></i> 4 Golpes do Pokémon (Clique para escolher):</label>
-          
+
           <div class="moves-interactive-slots-grid">
             <div class="move-slot-picker-btn" (click)="openMovePicker(0)">
               <span class="m-slot-title">Golpe 1</span>
               <span class="m-slot-val" [class.empty]="!editingMember()?.move1">
                 {{ editingMember()?.move1 || '+ Escolher Golpe 1' }}
               </span>
-              <button *ngIf="editingMember()?.move1" class="clear-m-btn" (click)="clearMoveSlot(0, $event)" title="Limpar Golpe">
+              <button *ngIf="editingMember()?.move1" class="clear-m-btn" (click)="clearMoveSlot(0, $event)"
+                title="Limpar Golpe">
                 <i class="ph-bold ph-x"></i>
               </button>
             </div>
@@ -405,7 +367,8 @@
               <span class="m-slot-val" [class.empty]="!editingMember()?.move2">
                 {{ editingMember()?.move2 || '+ Escolher Golpe 2' }}
               </span>
-              <button *ngIf="editingMember()?.move2" class="clear-m-btn" (click)="clearMoveSlot(1, $event)" title="Limpar Golpe">
+              <button *ngIf="editingMember()?.move2" class="clear-m-btn" (click)="clearMoveSlot(1, $event)"
+                title="Limpar Golpe">
                 <i class="ph-bold ph-x"></i>
               </button>
             </div>
@@ -415,7 +378,8 @@
               <span class="m-slot-val" [class.empty]="!editingMember()?.move3">
                 {{ editingMember()?.move3 || '+ Escolher Golpe 3' }}
               </span>
-              <button *ngIf="editingMember()?.move3" class="clear-m-btn" (click)="clearMoveSlot(2, $event)" title="Limpar Golpe">
+              <button *ngIf="editingMember()?.move3" class="clear-m-btn" (click)="clearMoveSlot(2, $event)"
+                title="Limpar Golpe">
                 <i class="ph-bold ph-x"></i>
               </button>
             </div>
@@ -425,7 +389,8 @@
               <span class="m-slot-val" [class.empty]="!editingMember()?.move4">
                 {{ editingMember()?.move4 || '+ Escolher Golpe 4' }}
               </span>
-              <button *ngIf="editingMember()?.move4" class="clear-m-btn" (click)="clearMoveSlot(3, $event)" title="Limpar Golpe">
+              <button *ngIf="editingMember()?.move4" class="clear-m-btn" (click)="clearMoveSlot(3, $event)"
+                title="Limpar Golpe">
                 <i class="ph-bold ph-x"></i>
               </button>
             </div>
@@ -450,18 +415,16 @@
       <div class="modal-header center warning-header">
         <i class="ph-bold ph-warning-octagon warning-icon"></i>
         <h2>Altere o nome do pokémon</h2>
-        <p>Um Pokémon com o nome '{{ editingMember()?.nickname || editingMember()?.pokemonName }}' já existe na sua lista de salvos.</p>
+        <p>Um Pokémon com o nome '{{ editingMember()?.nickname || editingMember()?.pokemonName }}' já existe na sua
+          lista de salvos.</p>
       </div>
 
       <div class="duplicate-body">
         <label>Defina um apelido único para salvar este Pokémon:</label>
-        <input 
-          type="text" 
-          class="text-input highlight-input"
-          [ngModel]="duplicateSuggestedName()"
-          (ngModelChange)="duplicateSuggestedName.set($event)"
-        />
-        <small class="suggested-hint"><i class="ph-bold ph-sparkle"></i> Sugerimos um nome único sequencial para você.</small>
+        <input type="text" class="text-input highlight-input" [ngModel]="duplicateSuggestedName()"
+          (ngModelChange)="duplicateSuggestedName.set($event)" />
+        <small class="suggested-hint"><i class="ph-bold ph-sparkle"></i> Sugerimos um nome único sequencial para
+          você.</small>
       </div>
 
       <div class="modal-footer">
@@ -484,23 +447,21 @@
       </div>
 
       <div class="moves-tabs-bar">
-        <button class="tab-btn" [class.active]="movePickerTab() === 'levelUp'" (click)="setMovePickerTab('levelUp')">Por Nível</button>
-        <button class="tab-btn" [class.active]="movePickerTab() === 'tm'" (click)="setMovePickerTab('tm')">Por TM / HM</button>
-        <button class="tab-btn" [class.active]="movePickerTab() === 'egg'" (click)="setMovePickerTab('egg')">Por Ovos (Egg)</button>
-        <button class="tab-btn" [class.active]="movePickerTab() === 'tutor'" (click)="setMovePickerTab('tutor')">Por Tutor</button>
+        <button class="tab-btn" [class.active]="movePickerTab() === 'levelUp'" (click)="setMovePickerTab('levelUp')">Por
+          Nível</button>
+        <button class="tab-btn" [class.active]="movePickerTab() === 'tm'" (click)="setMovePickerTab('tm')">Por TM /
+          HM</button>
+        <button class="tab-btn" [class.active]="movePickerTab() === 'egg'" (click)="setMovePickerTab('egg')">Por Ovos
+          (Egg)</button>
+        <button class="tab-btn" [class.active]="movePickerTab() === 'tutor'" (click)="setMovePickerTab('tutor')">Por
+          Tutor</button>
       </div>
 
       <div class="move-search-box">
         <i class="ph-bold ph-magnifying-glass"></i>
-        <input 
-          #moveSearchInput
-          type="text" 
-          class="text-input" 
-          placeholder="Digite para buscar o golpe imediatamente..."
-          [ngModel]="movePickerSearch()"
-          (ngModelChange)="onMoveSearchChange($event)"
-          (keydown)="onMovePickerKeydown($event)"
-        />
+        <input #moveSearchInput type="text" class="text-input" placeholder="Digite para buscar o golpe imediatamente..."
+          [ngModel]="movePickerSearch()" (ngModelChange)="onMoveSearchChange($event)"
+          (keydown)="onMovePickerKeydown($event)" />
       </div>
 
       <div class="moves-picker-split-view">
@@ -509,12 +470,9 @@
             <p>Nenhum golpe encontrado nesta categoria.</p>
           </div>
 
-          <div 
-            *ngFor="let m of getFilteredMovesForTab(); let idx = index" 
-            class="move-row-item"
+          <div *ngFor="let m of getFilteredMovesForTab(); let idx = index" class="move-row-item"
             [class.active]="selectedPreviewMove()?.name === m.name || highlightedMoveIndex() === idx"
-            (click)="selectPreviewMove(m, idx)"
-          >
+            (click)="selectPreviewMove(m, idx)">
             <div class="m-left">
               <span *ngIf="movePickerTab() === 'levelUp'" class="m-lvl">Lvl {{ m.level || 1 }}</span>
               <span class="m-name">{{ m.name }}</span>
@@ -541,15 +499,20 @@
             </div>
 
             <div class="prev-stats-row">
-              <div class="stat-pill"><span class="lbl">Categoria:</span><span class="val">{{ selectedPreviewMove()?.category | titlecase }}</span></div>
-              <div class="stat-pill"><span class="lbl">Poder:</span><span class="val">{{ selectedPreviewMove()?.power ?? '—' }}</span></div>
-              <div class="stat-pill"><span class="lbl">Precisão:</span><span class="val">{{ selectedPreviewMove()?.accuracy ? selectedPreviewMove()?.accuracy + '%' : '—' }}</span></div>
-              <div class="stat-pill"><span class="lbl">PP:</span><span class="val">{{ selectedPreviewMove()?.pp ?? '—' }}</span></div>
+              <div class="stat-pill"><span class="lbl">Categoria:</span><span class="val">{{
+                  selectedPreviewMove()?.category | titlecase }}</span></div>
+              <div class="stat-pill"><span class="lbl">Poder:</span><span class="val">{{ selectedPreviewMove()?.power ??
+                  '—' }}</span></div>
+              <div class="stat-pill"><span class="lbl">Precisão:</span><span class="val">{{
+                  selectedPreviewMove()?.accuracy ? selectedPreviewMove()?.accuracy + '%' : '—' }}</span></div>
+              <div class="stat-pill"><span class="lbl">PP:</span><span class="val">{{ selectedPreviewMove()?.pp ?? '—'
+                  }}</span></div>
             </div>
 
             <div class="prev-desc-box">
               <h4>Descrição do Golpe:</h4>
-              <p>{{ selectedPreviewMove()?.descriptionPt || selectedPreviewMove()?.description || 'Sem descrição.' }}</p>
+              <p>{{ selectedPreviewMove()?.descriptionPt || selectedPreviewMove()?.description || 'Sem descrição.' }}
+              </p>
             </div>
 
             <button class="select-this-move-btn" (click)="confirmSelectedMove()">
@@ -589,9 +552,12 @@
         </div>
 
         <div class="info-stats-grid">
-          <div class="info-stat-card"><span class="lbl">Poder</span><span class="val">{{ infoModalData()?.power ?? '—' }}</span></div>
-          <div class="info-stat-card"><span class="lbl">Precisão</span><span class="val">{{ infoModalData()?.accuracy ? infoModalData()?.accuracy + '%' : '—' }}</span></div>
-          <div class="info-stat-card"><span class="lbl">PP</span><span class="val">{{ infoModalData()?.pp ?? '—' }}</span></div>
+          <div class="info-stat-card"><span class="lbl">Poder</span><span class="val">{{ infoModalData()?.power ?? '—'
+              }}</span></div>
+          <div class="info-stat-card"><span class="lbl">Precisão</span><span class="val">{{ infoModalData()?.accuracy ?
+              infoModalData()?.accuracy + '%' : '—' }}</span></div>
+          <div class="info-stat-card"><span class="lbl">PP</span><span class="val">{{ infoModalData()?.pp ?? '—'
+              }}</span></div>
         </div>
 
         <div class="info-desc-box">
@@ -649,11 +615,7 @@
         </div>
 
         <div *ngIf="!loadingTeams() && userTeams().length > 0" class="import-teams-grid">
-          <div 
-            *ngFor="let team of userTeams()" 
-            class="import-team-card" 
-            (click)="selectTeamForImport(team)"
-          >
+          <div *ngFor="let team of userTeams()" class="import-team-card" (click)="selectTeamForImport(team)">
             <div class="team-card-top">
               <h3 class="team-title">{{ team.name }}</h3>
               <span class="game-tag"><i class="ph-bold ph-game-controller"></i> {{ team.gameVersion || 'Geral' }}</span>
@@ -662,10 +624,11 @@
             <!-- 6 Sprites Row -->
             <div class="team-sprites-row">
               <div *ngFor="let m of team.members" class="mini-member-chip">
-                <img [src]="m.spriteUrl" [alt]="m.pokemonName" class="mini-sprite" [title]="m.nickname || m.pokemonName" />
+                <img [src]="m.spriteUrl" [alt]="m.pokemonName" class="mini-sprite"
+                  [title]="m.nickname || m.pokemonName" />
               </div>
             </div>
-            
+
             <button class="select-team-btn">
               <span>Selecionar Este Time</span>
               <i class="ph-bold ph-arrow-right"></i>
@@ -686,12 +649,8 @@
         <p class="sub-hint">Marque as caixas dos Pokémon que deseja importar para sua biblioteca:</p>
 
         <div class="members-select-grid">
-          <div 
-            *ngFor="let m of selectedTeamForImport()?.members; let idx = index" 
-            class="member-select-card"
-            [class.selected]="isMemberSelected(m.slotPosition - 1)"
-            (click)="toggleMemberSelection(m.slotPosition - 1)"
-          >
+          <div *ngFor="let m of selectedTeamForImport()?.members; let idx = index" class="member-select-card"
+            [class.selected]="isMemberSelected(m.slotPosition - 1)" (click)="toggleMemberSelection(m.slotPosition - 1)">
             <input type="checkbox" [checked]="isMemberSelected(m.slotPosition - 1)" readonly class="choice-checkbox" />
             <img [src]="m.spriteUrl" [alt]="m.pokemonName" class="choice-sprite" />
             <div class="choice-info">
@@ -738,16 +697,13 @@
 
               <!-- Duplicate Warning Message -->
               <p *ngIf="item.isExactDuplicate" class="dup-alert-text">
-                Um Pokémon com a mesma natureza ({{ item.member.nature }}), habilidade e golpes já existe na sua lista. Salvar mesmo assim com o nome sugerido abaixo?
+                Um Pokémon com a mesma natureza ({{ item.member.nature }}), habilidade e golpes já existe na sua lista.
+                Salvar mesmo assim com o nome sugerido abaixo?
               </p>
 
               <div class="input-box">
                 <label>Apelido no Salvo:</label>
-                <input 
-                  type="text" 
-                  class="text-input"
-                  [(ngModel)]="importItems()[itemIdx].nickname"
-                />
+                <input type="text" class="text-input" [(ngModel)]="importItems()[itemIdx].nickname" />
               </div>
             </div>
           </div>

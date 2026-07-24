@@ -74,18 +74,28 @@
     <div class="filters-panel" [class.collapsed]="filtersCollapsed()">
 
       <!-- Game Version Filter -->
-      <div class="filter-group">
-        <div class="filter-group-header">
+      <div class="filter-group" [class.section-collapsed]="isSectionCollapsed('game')">
+        <div class="filter-group-header clickable" (click)="toggleSectionCollapse('game')" title="Clique para expandir/recolher">
           <span class="filter-label"><i class="ph-bold ph-game-controller"></i> Jogo / Versão:</span>
           <span class="filter-subtext">(Filtrar Pokédex por jogo oficial)</span>
+          <i class="ph-bold section-caret" [class.ph-caret-up]="!isSectionCollapsed('game')" [class.ph-caret-down]="isSectionCollapsed('game')"></i>
         </div>
-        <div class="game-pills-wrap">
+        <div *ngIf="!isSectionCollapsed('game')" class="game-pills-wrap">
           <button 
             *ngFor="let g of availableGames()" 
             class="game-pill"
             [class.active]="selectedGame() === g.id"
             (click)="selectGameFilter(g.id)"
           >
+            <div class="mini-cover-box">
+              <img 
+                [src]="'assets/covers/' + g.id + '.png'" 
+                (error)="onCoverError($event)" 
+                [alt]="g.name" 
+                class="mini-cover-img" 
+              />
+              <i class="ph-bold ph-game-controller cover-fallback-icon"></i>
+            </div>
             <span>{{ g.name }}</span>
             <i *ngIf="selectedGame() === g.id" class="ph-bold ph-check check-icon"></i>
           </button>
@@ -93,12 +103,13 @@
       </div>
 
       <!-- Types Filter (Max 2) -->
-      <div class="filter-group">
-        <div class="filter-group-header">
+      <div class="filter-group" [class.section-collapsed]="isSectionCollapsed('types')">
+        <div class="filter-group-header clickable" (click)="toggleSectionCollapse('types')" title="Clique para expandir/recolher">
           <span class="filter-label">Tipos Elementais:</span>
           <span class="filter-subtext">(Selecione até 2 tipos)</span>
+          <i class="ph-bold section-caret" [class.ph-caret-up]="!isSectionCollapsed('types')" [class.ph-caret-down]="isSectionCollapsed('types')"></i>
         </div>
-        <div class="type-pills-wrap">
+        <div *ngIf="!isSectionCollapsed('types')" class="type-pills-wrap">
           <button 
             *ngFor="let t of availableTypes()" 
             class="type-pill" 
@@ -113,11 +124,12 @@
       </div>
 
       <!-- Generation Filter -->
-      <div class="filter-group">
-        <div class="filter-group-header">
+      <div class="filter-group" [class.section-collapsed]="isSectionCollapsed('gens')">
+        <div class="filter-group-header clickable" (click)="toggleSectionCollapse('gens')" title="Clique para expandir/recolher">
           <span class="filter-label">Gerações:</span>
+          <i class="ph-bold section-caret" [class.ph-caret-up]="!isSectionCollapsed('gens')" [class.ph-caret-down]="isSectionCollapsed('gens')"></i>
         </div>
-        <div class="gen-pills-wrap">
+        <div *ngIf="!isSectionCollapsed('gens')" class="gen-pills-wrap">
           <button 
             *ngFor="let g of availableGens" 
             class="gen-pill" 

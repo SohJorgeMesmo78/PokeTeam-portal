@@ -103,7 +103,7 @@
     font-size: 0.8rem;
   }
 
-  &.exc-red {
+  &.exc- {
     background: rgba(239, 68, 68, 0.3);
     color: #f87171;
     border: 1px solid rgba(239, 68, 68, 0.6);
@@ -206,24 +206,77 @@
 }
 
 /* Background gradient glows according to type */
-.card-type-fire .card-bg-glow { background: var(--type-fire); }
-.card-type-water .card-bg-glow { background: var(--type-water); }
-.card-type-grass .card-bg-glow { background: var(--type-grass); }
-.card-type-electric .card-bg-glow { background: var(--type-electric); }
-.card-type-psychic .card-bg-glow { background: var(--type-psychic); }
-.card-type-ice .card-bg-glow { background: var(--type-ice); }
-.card-type-dragon .card-bg-glow { background: var(--type-dragon); }
-.card-type-dark .card-bg-glow { background: var(--type-dark); }
-.card-type-fairy .card-bg-glow { background: var(--type-fairy); }
-.card-type-fighting .card-bg-glow { background: var(--type-fighting); }
-.card-type-poison .card-bg-glow { background: var(--type-poison); }
-.card-type-ground .card-bg-glow { background: var(--type-ground); }
-.card-type-flying .card-bg-glow { background: var(--type-flying); }
-.card-type-bug .card-bg-glow { background: var(--type-bug); }
-.card-type-rock .card-bg-glow { background: var(--type-rock); }
-.card-type-ghost .card-bg-glow { background: var(--type-ghost); }
-.card-type-steel .card-bg-glow { background: var(--type-steel); }
-.card-type-normal .card-bg-glow { background: var(--type-normal); }
+.card-type-fire .card-bg-glow {
+  background: var(--type-fire);
+}
+
+.card-type-water .card-bg-glow {
+  background: var(--type-water);
+}
+
+.card-type-grass .card-bg-glow {
+  background: var(--type-grass);
+}
+
+.card-type-electric .card-bg-glow {
+  background: var(--type-electric);
+}
+
+.card-type-psychic .card-bg-glow {
+  background: var(--type-psychic);
+}
+
+.card-type-ice .card-bg-glow {
+  background: var(--type-ice);
+}
+
+.card-type-dragon .card-bg-glow {
+  background: var(--type-dragon);
+}
+
+.card-type-dark .card-bg-glow {
+  background: var(--type-dark);
+}
+
+.card-type-fairy .card-bg-glow {
+  background: var(--type-fairy);
+}
+
+.card-type-fighting .card-bg-glow {
+  background: var(--type-fighting);
+}
+
+.card-type-poison .card-bg-glow {
+  background: var(--type-poison);
+}
+
+.card-type-ground .card-bg-glow {
+  background: var(--type-ground);
+}
+
+.card-type-flying .card-bg-glow {
+  background: var(--type-flying);
+}
+
+.card-type-bug .card-bg-glow {
+  background: var(--type-bug);
+}
+
+.card-type-rock .card-bg-glow {
+  background: var(--type-rock);
+}
+
+.card-type-ghost .card-bg-glow {
+  background: var(--type-ghost);
+}
+
+.card-type-steel .card-bg-glow {
+  background: var(--type-steel);
+}
+
+.card-type-normal .card-bg-glow {
+  background: var(--type-normal);
+}
 
 @media (max-width: 576px) {
   .pokemon-card {

@@ -46,6 +46,11 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedGens = signal<number[]>([]);
   selectedGame = signal<string>('');
   filtersCollapsed = signal<boolean>(true);
+  collapsedSections = signal<Record<string, boolean>>({
+    game: false,
+    types: false,
+    gens: false
+  });
 
   // Card Grid density/sizing control ('compact' = ~6/row, 'normal' = ~4/row, 'large' = ~3/row)
   gridDensity = signal<'compact' | 'normal' | 'large'>('compact');
@@ -294,5 +299,29 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
   closeModal(): void {
     this.selectedPokemon.set(null);
     this.selectedSpecies.set(null);
+  }
+
+  toggleSectionCollapse(sectionKey: string): void {
+    const current = this.collapsedSections();
+    this.collapsedSections.set({
+      ...current,
+      [sectionKey]: !current[sectionKey]
+    });
+  }
+
+  isSectionCollapsed(sectionKey: string): boolean {
+    return !!this.collapsedSections()[sectionKey];
+  }
+
+  onCoverError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img) {
+      img.style.display = 'none';
+      const parent = img.parentElement;
+      if (parent) {
+        const fallback = parent.querySelector('.cover-fallback-icon') as HTMLElement;
+        if (fallback) fallback.style.display = 'inline-flex';
+      }
+    }
   }
 }

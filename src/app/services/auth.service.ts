@@ -9,6 +9,11 @@ export interface User {
   id: number;
   username: string;
   email: string;
+  avatarUrl?: string;
+  favoritePokemonId?: number | null;
+  favoritePokemonName?: string | null;
+  favoritePokemonSprite?: string | null;
+  favoritePokemonHeight?: number | null;
   createdAt?: string;
 }
 
@@ -16,6 +21,15 @@ export interface AuthResponse {
   message: string;
   user: User;
   token: string;
+}
+
+export interface UpdateProfilePayload {
+  username?: string;
+  avatarUrl?: string;
+  favoritePokemonId?: number | null;
+  favoritePokemonName?: string | null;
+  favoritePokemonSprite?: string | null;
+  favoritePokemonHeight?: number | null;
 }
 
 const TOKEN_KEY = 'poketeam_auth_token';
@@ -40,8 +54,8 @@ export class AuthService {
     this.verifyToken();
   }
 
-  register(username: string, email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, { username, email, password }).pipe(
+  register(username: string, email: string, password: string, avatarUrl?: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, { username, email, password, avatarUrl }).pipe(
       tap((res) => this.setSession(res.user, res.token))
     );
   }
@@ -50,6 +64,44 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { login: loginValue, password }).pipe(
       tap((res) => this.setSession(res.user, res.token))
     );
+  }
+
+  updateProfile(data: UpdateProfilePayload): Observable<{ message: string; user: User }> {
+    const token = this._token();
+    const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+
+    return this.http.put<{ message: string; user: User }>(`${this.apiUrl}/profile`, data, { headers }).pipe(
+      tap((res) => {
+        if (res && res.user) {
+          this._currentUser.set(res.user);
+          if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+          }
+        }
+      }),
+      catchError((err) => {
+        if (err && (err.status === 404 || err.status === 405)) {
+          return this.http.post<{ message: string; user: User }>(`${this.apiUrl}/profile`, data, { headers }).pipe(
+            tap((res) => {
+              if (res && res.user) {
+                this._currentUser.set(res.user);
+                if (typeof window !== 'undefined' && window.localStorage) {
+                  localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+                }
+              }
+            })
+          );
+        }
+        throw err;
+      })
+    );
+  }
+
+  checkUsername(username: string): Observable<{ available: boolean }> {
+    const currentUserId = this._currentUser()?.id;
+    const params: any = { username };
+    if (currentUserId) params.currentUserId = currentUserId;
+    return this.http.get<{ available: boolean }>(`${this.apiUrl}/check-username`, { params });
   }
 
   logout(): void {

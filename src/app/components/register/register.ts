@@ -19,6 +19,48 @@ export class RegisterComponent {
   email = signal<string>('');
   password = signal<string>('');
   confirmPassword = signal<string>('');
+  selectedAvatar = signal<string>('assets/avatars/boy/a.png');
+  avatarGenderTab = signal<'boy' | 'girl'>('boy');
+  showAvatarModal = signal<boolean>(false);
+
+  readonly boyAvatars = [
+    'assets/avatars/boy/a.png',
+    'assets/avatars/boy/red.png',
+    'assets/avatars/boy/ash.png',
+    'assets/avatars/boy/blue.png',
+    'assets/avatars/boy/ethan.png',
+    'assets/avatars/boy/brendan.png',
+    'assets/avatars/boy/lucas.png',
+    'assets/avatars/boy/hilbert.png',
+    'assets/avatars/boy/nate.png',
+    'assets/avatars/boy/calem.png',
+    'assets/avatars/boy/elio.png',
+    'assets/avatars/boy/victor.png',
+    'assets/avatars/boy/florian.png',
+    'assets/avatars/boy/rei.png',
+    'assets/avatars/boy/silver.png',
+    'assets/avatars/boy/rocket.png',
+    'assets/avatars/boy/magma.png',
+    'assets/avatars/boy/aqua.png',
+  ];
+
+  readonly girlAvatars = [
+    'assets/avatars/girl/a.png',
+    'assets/avatars/girl/leaf.png',
+    'assets/avatars/girl/misty.png',
+    'assets/avatars/girl/lyra.png',
+    'assets/avatars/girl/may.png',
+    'assets/avatars/girl/dawn.png',
+    'assets/avatars/girl/hilda.png',
+    'assets/avatars/girl/rosa.png',
+    'assets/avatars/girl/serena.png',
+    'assets/avatars/girl/selene.png',
+    'assets/avatars/girl/gloria.png',
+    'assets/avatars/girl/juliana.png',
+    'assets/avatars/girl/rocket.png',
+    'assets/avatars/girl/magma.png',
+    'assets/avatars/girl/aqua.png',
+  ];
 
   showPassword = signal<boolean>(false);
   loading = signal<boolean>(false);
@@ -45,6 +87,30 @@ export class RegisterComponent {
     );
   });
 
+  selectAvatar(avatarPath: string): void {
+    this.selectedAvatar.set(avatarPath);
+  }
+
+  setGenderTab(gender: 'boy' | 'girl'): void {
+    this.avatarGenderTab.set(gender);
+    if (this.selectedAvatar().endsWith('/a.png')) {
+      this.selectedAvatar.set(`assets/avatars/${gender}/a.png`);
+    }
+  }
+
+  openAvatarModal(): void {
+    this.showAvatarModal.set(true);
+  }
+
+  closeAvatarModal(): void {
+    this.showAvatarModal.set(false);
+  }
+
+  selectAvatarAndClose(av: string): void {
+    this.selectedAvatar.set(av);
+    this.showAvatarModal.set(false);
+  }
+
   toggleShowPassword(): void {
     this.showPassword.update((v) => !v);
   }
@@ -61,7 +127,8 @@ export class RegisterComponent {
     this.authService.register(
       this.username().trim(),
       this.email().trim(),
-      this.password()
+      this.password(),
+      this.selectedAvatar()
     ).subscribe({
       next: () => {
         this.loading.set(false);

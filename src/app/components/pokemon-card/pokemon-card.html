@@ -1,18 +1,11 @@
-<div 
-  class="pokemon-card" 
-  [ngClass]="'card-type-' + primaryType"
-  (click)="onSelect()"
-  tabindex="0"
-  role="button"
-  (keydown.enter)="onSelect()"
-  (keydown.space)="onSelect()"
->
+<div class="pokemon-card" [ngClass]="'card-type-' + primaryType" (click)="onSelect()" tabindex="0" role="button"
+  (keydown.enter)="onSelect()" (keydown.space)="onSelect()">
   <div class="card-bg-glow"></div>
   <div class="pokeball-watermark">
     <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="8" opacity="0.12"/>
-      <path d="M5 50 H95" stroke="currentColor" stroke-width="8" opacity="0.12"/>
-      <circle cx="50" cy="50" r="16" fill="var(--bg-card)" stroke="currentColor" stroke-width="8" opacity="0.15"/>
+      <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="8" opacity="0.12" />
+      <path d="M5 50 H95" stroke="currentColor" stroke-width="8" opacity="0.12" />
+      <circle cx="50" cy="50" r="16" fill="var(--bg-card)" stroke="currentColor" stroke-width="8" opacity="0.15" />
     </svg>
   </div>
 
@@ -22,12 +15,8 @@
 
   <div class="card-body">
     <!-- Exclusive Game Badge Overlay (Placed between number and photo) -->
-    <span 
-      *ngIf="pokemon.exclusiveInfo?.isExclusive" 
-      class="exclusive-badge" 
-      [ngClass]="'exc-' + (pokemon.exclusiveInfo?.color || 'red')"
-      [title]="pokemon.exclusiveInfo?.gameTag"
-    >
+    <span *ngIf="pokemon.exclusiveInfo?.isExclusive" class="exclusive-badge"
+      [ngClass]="'exc-' + (pokemon.exclusiveInfo?.color || '')" [title]="pokemon.exclusiveInfo?.gameTag">
       <i class="ph-bold ph-star"></i>
       <span>{{ pokemon.exclusiveInfo?.gameTag }}</span>
     </span>
@@ -39,11 +28,7 @@
     <h3 class="pokemon-name">{{ pokemon.name }}</h3>
 
     <div class="type-container">
-      <span 
-        *ngFor="let t of pokemon.types" 
-        class="type-badge" 
-        [ngClass]="'type-' + t.type.name"
-      >
+      <span *ngFor="let t of pokemon.types" class="type-badge" [ngClass]="'type-' + t.type.name">
         {{ t.type.name }}
       </span>
     </div>

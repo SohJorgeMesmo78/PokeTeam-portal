@@ -1,0 +1,237 @@
+<div class="profile-page-container">
+  <div *ngIf="currentUser() as user" class="profile-card">
+    
+    <!-- LEFT SIDE: Full-Body Avatar Vertical Rectangle -->
+    <div class="profile-left-column">
+      <div class="avatar-full-rectangle">
+        <!-- Sprite do Treinador (Centralizada e em destaque) -->
+        <img 
+          [src]="selectedAvatar()" 
+          (error)="onAvatarError($event)" 
+          alt="Avatar do Treinador" 
+          class="trainer-sprite" 
+        />
+
+        <!-- Sprite do Pokémon Favorito (Se existir) -->
+        <img 
+          *ngIf="selectedFavPokemonSprite()" 
+          [src]="selectedFavPokemonSprite()" 
+          [alt]="selectedFavPokemonName() || 'Pokémon Favorito'" 
+          class="pokemon-sprite"
+          [class.pokemon-small-front]="(selectedFavPokemonHeight() ?? 0) <= 17"
+          [class.pokemon-large-back]="(selectedFavPokemonHeight() ?? 0) > 17"
+        />
+
+        <div class="avatar-overlay-gradient"></div>
+      </div>
+
+      <button type="button" class="change-avatar-btn" (click)="openAvatarModal()">
+        <i class="ph-bold ph-user-focus"></i> Trocar Avatar
+      </button>
+    </div>
+
+    <!-- RIGHT SIDE: Profile Information & Form -->
+    <div class="profile-right-column">
+      <div class="profile-header-info">
+        <h2>Perfil de {{ user.username }}</h2>
+        <p class="subtitle">Gerencie as informações da sua conta e personalize seu perfil</p>
+      </div>
+
+      <div class="profile-form">
+        <!-- Campo 1: Nome de Usuário (Editável com Validação) -->
+        <div class="form-group">
+          <label for="profile-username">Nome de Usuário</label>
+          <div class="input-wrapper">
+            <i class="ph-bold ph-user input-icon"></i>
+            <input 
+              id="profile-username" 
+              type="text" 
+              [ngModel]="usernameInput()" 
+              (ngModelChange)="onUsernameInput($event)"
+              placeholder="Digite seu nome de usuário..." 
+            />
+            <div *ngIf="checkingUsername()" class="spinner-icon">
+              <i class="ph-bold ph-spinner spin"></i>
+            </div>
+          </div>
+
+          <!-- Feedbacks do Nome de Usuário -->
+          <span *ngIf="isUsernameAvailable() === true && isUsernameChanged()" class="field-success">
+            <i class="ph-bold ph-check-circle"></i> Nome de usuário disponível!
+          </span>
+          <span *ngIf="usernameError()" class="field-error">
+            <i class="ph-bold ph-warning-circle"></i> {{ usernameError() }}
+          </span>
+        </div>
+
+        <!-- Campo 2: E-mail (Não Editável) -->
+        <div class="form-group">
+          <label for="profile-email">E-mail (Não Editável)</label>
+          <div class="input-wrapper disabled">
+            <i class="ph-bold ph-envelope input-icon"></i>
+            <input id="profile-email" type="email" [value]="user.email" disabled />
+            <i class="ph-bold ph-lock lock-icon" title="E-mail não pode ser alterado no momento"></i>
+          </div>
+        </div>
+
+        <!-- Campo 3: Pokémon Favorito -->
+        <div class="form-group">
+          <label>Pokémon Favorito</label>
+
+          <div class="favorite-pokemon-picker-card" (click)="openPokemonModal()">
+            <ng-container *ngIf="selectedFavPokemonId(); else emptyFavTpl">
+              <div class="fav-pokemon-active">
+                <div class="fav-img-wrapper">
+                  <img [src]="selectedFavPokemonSprite()" [alt]="selectedFavPokemonName()" class="fav-pokemon-img" />
+                </div>
+                <div class="fav-pokemon-details">
+                  <span class="fav-id">#{{ selectedFavPokemonId() | number: '3.0-0' }}</span>
+                  <span class="fav-name">{{ selectedFavPokemonName() }}</span>
+                </div>
+                <button type="button" class="clear-fav-btn" (click)="clearFavoritePokemon($event)" title="Remover favorito">
+                  <i class="ph-bold ph-trash"></i>
+                </button>
+              </div>
+            </ng-container>
+
+            <ng-template #emptyFavTpl>
+              <div class="fav-pokemon-empty">
+                <div class="empty-icon-circle">
+                  <i class="ph-bold ph-sparkles"></i>
+                </div>
+                <div class="empty-text">
+                  <span class="title">Selecionar Pokémon Favorito</span>
+                  <span class="sub">Clique para buscar na Pokédex</span>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+
+        <!-- Membro Desde -->
+        <div *ngIf="user.createdAt" class="info-row">
+          <span class="info-label"><i class="ph-bold ph-calendar-blank"></i> Membro Desde:</span>
+          <span class="info-value">{{ user.createdAt | date: 'dd/MM/yyyy' }}</span>
+        </div>
+
+        <!-- Botão Salvar (Habilitado apenas quando alterado e disponível) -->
+        <button 
+          type="button" 
+          class="save-profile-btn" 
+          [disabled]="isSaveDisabled()" 
+          (click)="saveProfile()"
+        >
+          <span *ngIf="!saving()"><i class="ph-bold ph-floppy-disk"></i> Salvar Alterações</span>
+          <span *ngIf="saving()" class="loading-wrap">
+            <div class="pokeball-spinner-small"></div> Salvando...
+          </span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL DE ESCOLHA DE AVATAR -->
+<div *ngIf="showAvatarModal()" class="avatar-modal-overlay" (click)="closeAvatarModal()">
+  <div class="avatar-modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="ph-bold ph-user-circle"></i> Escolha seu Avatar</h3>
+      <button class="close-modal-btn" (click)="closeAvatarModal()"><i class="ph-bold ph-x"></i></button>
+    </div>
+
+    <!-- Gender Selector in Modal -->
+    <div class="modal-gender-tabs">
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="avatarGenderTab() === 'boy'" 
+        (click)="setGenderTab('boy')"
+      >
+        Treinadores
+      </button>
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="avatarGenderTab() === 'girl'" 
+        (click)="setGenderTab('girl')"
+      >
+        Treinadoras
+      </button>
+    </div>
+
+    <!-- Larger Avatar Options Grid -->
+    <div class="modal-avatar-grid">
+      <ng-container *ngIf="avatarGenderTab() === 'boy'">
+        <div 
+          *ngFor="let av of boyAvatars" 
+          class="avatar-card-item"
+          [class.active]="selectedAvatar() === av"
+          (click)="selectAvatarAndClose(av)"
+        >
+          <img [src]="av" [alt]="av" class="avatar-perfil modal-size" [class.selected]="selectedAvatar() === av" />
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="avatarGenderTab() === 'girl'">
+        <div 
+          *ngFor="let av of girlAvatars" 
+          class="avatar-card-item"
+          [class.active]="selectedAvatar() === av"
+          (click)="selectAvatarAndClose(av)"
+        >
+          <img [src]="av" [alt]="av" class="avatar-perfil modal-size" [class.selected]="selectedAvatar() === av" />
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE ESCOLHA DE POKÉMON FAVORITO COM BUSCA -->
+<div *ngIf="showPokemonModal()" class="avatar-modal-overlay" (click)="closePokemonModal()">
+  <div class="avatar-modal-box pokemon-selector-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="ph-bold ph-sparkles"></i> Escolha seu Pokémon Favorito</h3>
+      <button class="close-modal-btn" (click)="closePokemonModal()"><i class="ph-bold ph-x"></i></button>
+    </div>
+
+    <!-- Input de Pesquisa -->
+    <div class="search-input-wrapper">
+      <i class="ph-bold ph-magnifying-glass search-icon"></i>
+      <input 
+        type="text" 
+        placeholder="Pesquisar por nome ou ID..." 
+        [ngModel]="pokemonSearchQuery()" 
+        (ngModelChange)="searchPokemons($event)"
+      />
+    </div>
+
+    <!-- Grid de Pokémons -->
+    <div class="modal-pokemon-grid">
+      <div *ngIf="loadingPokemons()" class="loading-state">
+        <div class="pokeball-spinner-small"></div> Buscando Pokédex...
+      </div>
+
+      <ng-container *ngIf="!loadingPokemons()">
+        <div 
+          *ngFor="let pk of searchResults()" 
+          class="pokemon-select-card"
+          [class.selected]="selectedFavPokemonId() === pk.id"
+          (click)="selectFavoritePokemon(pk)"
+        >
+          <img 
+            [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + pk.id + '.png'" 
+            [alt]="pk.name" 
+            class="pk-artwork"
+          />
+          <span class="pk-number">#{{ pk.id | number: '3.0-0' }}</span>
+          <span class="pk-name">{{ pk.name }}</span>
+        </div>
+
+        <div *ngIf="searchResults().length === 0" class="no-results">
+          Nenhum Pokémon encontrado.
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

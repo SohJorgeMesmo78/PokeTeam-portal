@@ -1,15 +1,107 @@
-<div class="placeholder-container">
-  <div class="ultra-card">
-    <div class="badge-tag">Em Breve</div>
-    <div class="icon-wrapper">
-      <i class="ph-bold ph-game-controller icon"></i>
+<div class="game-versions-container">
+  <!-- Page Header -->
+  <div class="page-header center">
+    <div class="header-icon-badge">
+      <i class="ph-bold ph-game-controller"></i>
     </div>
-    <h2>Diferenças entre Versões & Exclusivos</h2>
-    <p>Compare as versões dos jogos (Red vs Blue, Gold vs Silver, Ruby vs Sapphire, etc.) e descubra quais Pokémon são exclusivos de cada jogo para planejar suas trocas!</p>
-    <div class="versions-preview">
-      <span class="v-pill red">Red / Scarlet</span>
-      <span class="vs">VS</span>
-      <span class="v-pill blue">Blue / Violet</span>
+    <h1>Comparação de Versões & Exclusivos</h1>
+    <p>Selecione um confronto entre jogos para comparar lado a lado quais Pokémon são exclusivos de cada versão.</p>
+  </div>
+
+  <!-- Comparison Selection Cards Grid -->
+  <div class="comparisons-grid">
+    <div 
+      *ngFor="let c of comparisons()" 
+      class="comparison-card"
+      [class.selected]="selectedId() === c.id"
+      (click)="selectComparison(c.id)"
+    >
+      <div class="card-gen-tag">{{ c.genTitle }}</div>
+      
+      <!-- Multi Covers Showcase (2 or 3 covers) -->
+      <div class="dual-covers-box">
+        <ng-container *ngFor="let g of c.games; let isLast = last">
+          <div class="cover-item">
+            <img [src]="g.coverUrl" (error)="onCoverError($event)" [alt]="g.name" class="cover-img" />
+            <i class="ph-bold ph-game-controller cover-fallback-icon"></i>
+          </div>
+          <div *ngIf="!isLast" class="vs-badge">VS</div>
+        </ng-container>
+      </div>
+
+      <h3 class="card-title">{{ c.title }}</h3>
+      <span class="card-sub">{{ c.games.length }} Versões do Jogo</span>
     </div>
+  </div>
+
+  <!-- ACTIVE COMPARISON TABLE SECTION -->
+  <div *ngIf="activeComparison() as group" class="comparison-detail-section">
+    
+    <!-- Table Header Banner -->
+    <div class="table-header-banner" [class.three-games]="group.games.length === 3">
+      <ng-container *ngFor="let g of group.games; let isLast = last">
+        <div class="banner-side">
+          <div class="side-cover">
+            <img [src]="g.coverUrl" (error)="onCoverError($event)" [alt]="g.name" class="banner-cover-img" />
+            <i class="ph-bold ph-game-controller cover-fallback-icon"></i>
+          </div>
+          <div class="side-info">
+            <span class="gen-chip">{{ group.genTitle }}</span>
+            <h2>{{ g.name }}</h2>
+            <span class="count-chip">{{ g.exclusives.length }} Exclusivos</span>
+          </div>
+        </div>
+        <div *ngIf="!isLast" class="banner-vs-divider">
+          <span>VS</span>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- COMPARISON TABLE (Tabelinha Lado a Lado para 2 ou 3 Jogos) -->
+    <div class="exclusives-table">
+      <!-- Table Column Headers -->
+      <div class="table-head-row" [style.gridTemplateColumns]="'repeat(' + group.games.length + ', 1fr)'">
+        <div *ngFor="let g of group.games" class="col-head">
+          <div class="mini-cover-box">
+            <img [src]="g.coverUrl" (error)="onCoverError($event)" [alt]="g.name" class="mini-cover-img" />
+            <i class="ph-bold ph-game-controller cover-fallback-icon"></i>
+          </div>
+          <span>{{ g.name }}</span>
+        </div>
+      </div>
+
+      <!-- Table Body Rows (Dynamic Grid 2 or 3 Columns) -->
+      <div class="table-body">
+        <div 
+          *ngFor="let row of getAlignedRows(group)" 
+          class="table-data-row" 
+          [style.gridTemplateColumns]="'repeat(' + group.games.length + ', 1fr)'"
+        >
+          
+          <div *ngFor="let p of row" class="data-col">
+            <div 
+              *ngIf="p" 
+              class="exclusive-pokemon-card clickable"
+              (click)="openPokemonDetail(p.id)"
+              title="Clique para ver os detalhes completos de {{ p.name }}"
+            >
+              <img [src]="p.spriteUrl" [alt]="p.name" class="poke-sprite" />
+              <div class="poke-meta">
+                <span class="poke-id">#{{ p.id.toString().padStart(4, '0') }}</span>
+                <h4 class="poke-name">{{ p.name }}</h4>
+                <div *ngIf="p.types" class="poke-types">
+                  <span *ngFor="let t of p.types" class="type-badge tiny" [ngClass]="'type-' + t">{{ t }}</span>
+                </div>
+              </div>
+              <i class="ph-bold ph-arrow-square-out arrow-icon"></i>
+            </div>
+            
+            <div *ngIf="!p" class="empty-slot-placeholder">—</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>

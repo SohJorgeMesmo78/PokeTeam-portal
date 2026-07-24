@@ -28,6 +28,13 @@ export class App {
     this.authService.logout();
   }
 
+  onAvatarError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img) {
+      img.src = 'assets/avatars/boy/a.png';
+    }
+  }
+
   @HostListener('document:keydown.escape')
   onEscape(): void {
     if (this.showConfigModal) {

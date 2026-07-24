@@ -16,37 +16,50 @@
   <div *ngIf="currentStep() === 1" class="step-section step-1-view">
     <div class="section-header center">
       <h1><i class="ph-bold ph-game-controller"></i> Selecione o jogo para montar o time</h1>
-      <p>Escolha a versão oficial do jogo para filtrar apenas a Pokédex Regional e os Pokémon disponíveis naquela versão.</p>
+      <p>Escolha o modo livre ou a versão oficial do jogo para filtrar a Pokédex Regional e os golpes disponíveis.</p>
     </div>
 
-    <!-- Games Grid (First option: Geral, followed by individual games without duplicates) -->
-    <div class="games-grid">
-      <!-- Option 1: Geral -->
-      <div 
-        class="game-select-card geral-card" 
-        [class.selected]="selectedGame() === 'geral'"
-        (click)="selectGame('geral')"
-      >
-        <div class="card-icon"><i class="ph-bold ph-globe-hemisphere-west"></i></div>
-        <h3>Geral</h3>
-        <span class="sub">Todos os 1025 Pokémon liberados</span>
-        <i class="ph-bold ph-arrow-right arrow-icon"></i>
+    <div class="game-generations-container">
+      <!-- Row 1: Geral (Modo Livre) -->
+      <div class="gen-section-block">
+        <h3 class="gen-section-title"><i class="ph-bold ph-globe-hemisphere-west"></i> Modo Livre</h3>
+        <div class="games-row-grid single">
+          <div class="game-select-card geral-card" [class.selected]="selectedGame() === 'geral'"
+            (click)="selectGame('geral')">
+            <div class="game-cover-box">
+              <img src="assets/covers/geral.png" (error)="onCoverError($event)" alt="Geral" class="game-cover-img" />
+              <div class="cover-fallback-icon"><i class="ph-bold ph-globe"></i></div>
+            </div>
+            <div class="game-card-info">
+              <div class="card-header-badge">Modo Livre</div>
+              <h3>Geral</h3>
+              <span class="sub">Todos os 1025 Pokémon liberados</span>
+            </div>
+            <i class="ph-bold ph-arrow-right arrow-icon"></i>
+          </div>
+        </div>
       </div>
 
-      <!-- Individual Games (Excluding duplicate geral) -->
-      <ng-container *ngFor="let g of availableGames()">
-        <div 
-          *ngIf="g.id !== 'geral'"
-          class="game-select-card"
-          [class.selected]="selectedGame() === g.id"
-          (click)="selectGame(g.id)"
-        >
-          <div class="card-header-badge">Gen {{ g.gen }}</div>
-          <h3>{{ g.name }}</h3>
-          <span class="sub">Pokédex Regional {{ g.name }}</span>
-          <i class="ph-bold ph-arrow-right arrow-icon"></i>
+      <!-- Rows by Generation -->
+      <div *ngFor="let group of gamesByGen()" class="gen-section-block">
+        <h3 class="gen-section-title"><i class="ph-bold ph-sparkle"></i> {{ group.genTitle }}</h3>
+        <div class="games-row-grid">
+          <div *ngFor="let g of group.games" class="game-select-card" [class.selected]="selectedGame() === g.id"
+            (click)="selectGame(g.id)">
+            <div class="game-cover-box">
+              <img [src]="'assets/covers/' + g.id + '.png'" (error)="onCoverError($event)" [alt]="g.name"
+                class="game-cover-img" />
+              <div class="cover-fallback-icon"><i class="ph-bold ph-game-controller"></i></div>
+            </div>
+            <div class="game-card-info">
+              <div class="card-header-badge">Gen {{ g.gen }}</div>
+              <h3>{{ g.name }}</h3>
+              <span class="sub">Pokédex Regional {{ g.name }}</span>
+            </div>
+            <i class="ph-bold ph-arrow-right arrow-icon"></i>
+          </div>
         </div>
-      </ng-container>
+      </div>
     </div>
   </div>
 
@@ -67,13 +80,8 @@
       <!-- Team Name Input -->
       <div class="team-name-input-box">
         <label><i class="ph-bold ph-pencil-simple"></i> Nome do Time:</label>
-        <input 
-          type="text" 
-          class="team-name-field" 
-          placeholder="Digite o nome do time..."
-          [ngModel]="teamNameInput()" 
-          (ngModelChange)="teamNameInput.set($event)"
-        />
+        <input type="text" class="team-name-field" placeholder="Digite o nome do time..." [ngModel]="teamNameInput()"
+          (ngModelChange)="teamNameInput.set($event)" />
       </div>
 
       <button class="save-team-main-btn" (click)="saveTeam()">
@@ -85,7 +93,7 @@
     <!-- 6 SLOTS LAYOUT (3 Rows of 2 Rectangles Each = 2 Columns x 3 Rows Grid) -->
     <div class="slots-3x2-grid">
       <div *ngFor="let slotIdx of [0, 1, 2, 3, 4, 5]" class="slot-rectangle-card">
-        
+
         <!-- FILLED SLOT CONTENT -->
         <div *ngIf="teamMembers()[slotIdx]" class="slot-filled-card">
           <div class="slot-card-header">
@@ -96,12 +104,15 @@
           </div>
 
           <div class="slot-card-body">
-            <img [src]="teamMembers()[slotIdx]?.spriteUrl" [alt]="teamMembers()[slotIdx]?.pokemonName" class="pokemon-sprite" />
-            
+            <img [src]="teamMembers()[slotIdx]?.spriteUrl" [alt]="teamMembers()[slotIdx]?.pokemonName"
+              class="pokemon-sprite" />
+
             <div class="pokemon-meta-col">
               <h3 class="pokemon-display-name">
                 {{ teamMembers()[slotIdx]?.nickname || teamMembers()[slotIdx]?.pokemonName }}
-                <span *ngIf="teamMembers()[slotIdx]?.nickname && teamMembers()[slotIdx]?.nickname !== teamMembers()[slotIdx]?.pokemonName" class="species-sub">
+                <span
+                  *ngIf="teamMembers()[slotIdx]?.nickname && teamMembers()[slotIdx]?.nickname !== teamMembers()[slotIdx]?.pokemonName"
+                  class="species-sub">
                   ({{ teamMembers()[slotIdx]?.pokemonName }})
                 </span>
               </h3>
@@ -116,11 +127,9 @@
                 <span class="pill nature" [title]="getNatureDescription(teamMembers()[slotIdx]?.nature)">
                   Nature: <strong>{{ teamMembers()[slotIdx]?.nature || 'Hardy' }}</strong>
                 </span>
-                <span 
-                  class="pill ability clickable" 
+                <span class="pill ability clickable"
                   (click)="openAbilityInfoModal(teamMembers()[slotIdx]?.abilityName, $event)"
-                  title="Clique para ver detalhes da habilidade"
-                >
+                  title="Clique para ver detalhes da habilidade">
                   Habilidade: <strong>{{ teamMembers()[slotIdx]?.abilityName || 'Padrão' }}</strong>
                   <i class="ph-bold ph-info"></i>
                 </span>
@@ -131,106 +140,122 @@
           <!-- 4 Moves Display Grid (Rich mini-chips with Nome, Tipo, Categoria, PP, Dano & Acc) -->
           <div class="slot-moves-rich-grid">
             <!-- Move 1 -->
-            <div 
-              class="move-rich-chip" 
-              [class.empty]="!teamMembers()[slotIdx]?.move1"
+            <div class="move-rich-chip" [class.empty]="!teamMembers()[slotIdx]?.move1"
               (click)="openMoveInfoModal(teamMembers()[slotIdx]?.move1, $event)"
-              title="Clique para ver detalhes do golpe"
-            >
+              title="Clique para ver detalhes do golpe">
               <div class="m-top">
                 <span class="m-name">{{ teamMembers()[slotIdx]?.move1 || '— Golpe 1' }}</span>
-                <span *ngIf="teamMembers()[slotIdx]?.move1" class="type-badge micro" [ngClass]="'type-' + (getMoveInfo(teamMembers()[slotIdx]?.move1)?.type || 'normal')">
+                <span *ngIf="teamMembers()[slotIdx]?.move1" class="type-badge micro"
+                  [ngClass]="'type-' + (getMoveInfo(teamMembers()[slotIdx]?.move1)?.type || 'normal')">
                   {{ getMoveInfo(teamMembers()[slotIdx]?.move1)?.type || 'normal' }}
                 </span>
               </div>
               <div *ngIf="teamMembers()[slotIdx]?.move1" class="m-details-row">
                 <span class="m-cat">
-                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move1)?.category === 'physical'" class="ph-bold ph-sword"></i>
-                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move1)?.category === 'special'" class="ph-bold ph-sparkle"></i>
-                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move1)?.category === 'status'" class="ph-bold ph-shield-check"></i>
+                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move1)?.category === 'physical'"
+                    class="ph-bold ph-sword"></i>
+                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move1)?.category === 'special'"
+                    class="ph-bold ph-sparkle"></i>
+                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move1)?.category === 'status'"
+                    class="ph-bold ph-shield-check"></i>
                   {{ getMoveInfo(teamMembers()[slotIdx]?.move1)?.category | titlecase }}
                 </span>
-                <span class="m-stat">PP: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move1)?.pp ?? '—' }}</strong></span>
-                <span class="m-stat">Dano: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move1)?.power ?? '—' }}</strong></span>
-                <span class="m-stat">Acc: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move1)?.accuracy ? getMoveInfo(teamMembers()[slotIdx]?.move1)?.accuracy + '%' : '—' }}</strong></span>
+                <span class="m-stat">PP: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move1)?.pp ?? '—'
+                    }}</strong></span>
+                <span class="m-stat">Dano: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move1)?.power ?? '—'
+                    }}</strong></span>
+                <span class="m-stat">Acc: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move1)?.accuracy ?
+                    getMoveInfo(teamMembers()[slotIdx]?.move1)?.accuracy + '%' : '—' }}</strong></span>
               </div>
             </div>
 
             <!-- Move 2 -->
-            <div 
-              class="move-rich-chip" 
-              [class.empty]="!teamMembers()[slotIdx]?.move2"
+            <div class="move-rich-chip" [class.empty]="!teamMembers()[slotIdx]?.move2"
               (click)="openMoveInfoModal(teamMembers()[slotIdx]?.move2, $event)"
-              title="Clique para ver detalhes do golpe"
-            >
+              title="Clique para ver detalhes do golpe">
               <div class="m-top">
                 <span class="m-name">{{ teamMembers()[slotIdx]?.move2 || '— Golpe 2' }}</span>
-                <span *ngIf="teamMembers()[slotIdx]?.move2" class="type-badge micro" [ngClass]="'type-' + (getMoveInfo(teamMembers()[slotIdx]?.move2)?.type || 'normal')">
+                <span *ngIf="teamMembers()[slotIdx]?.move2" class="type-badge micro"
+                  [ngClass]="'type-' + (getMoveInfo(teamMembers()[slotIdx]?.move2)?.type || 'normal')">
                   {{ getMoveInfo(teamMembers()[slotIdx]?.move2)?.type || 'normal' }}
                 </span>
               </div>
               <div *ngIf="teamMembers()[slotIdx]?.move2" class="m-details-row">
                 <span class="m-cat">
-                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move2)?.category === 'physical'" class="ph-bold ph-sword"></i>
-                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move2)?.category === 'special'" class="ph-bold ph-sparkle"></i>
-                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move2)?.category === 'status'" class="ph-bold ph-shield-check"></i>
+                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move2)?.category === 'physical'"
+                    class="ph-bold ph-sword"></i>
+                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move2)?.category === 'special'"
+                    class="ph-bold ph-sparkle"></i>
+                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move2)?.category === 'status'"
+                    class="ph-bold ph-shield-check"></i>
                   {{ getMoveInfo(teamMembers()[slotIdx]?.move2)?.category | titlecase }}
                 </span>
-                <span class="m-stat">PP: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move2)?.pp ?? '—' }}</strong></span>
-                <span class="m-stat">Dano: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move2)?.power ?? '—' }}</strong></span>
-                <span class="m-stat">Acc: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move2)?.accuracy ? getMoveInfo(teamMembers()[slotIdx]?.move2)?.accuracy + '%' : '—' }}</strong></span>
+                <span class="m-stat">PP: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move2)?.pp ?? '—'
+                    }}</strong></span>
+                <span class="m-stat">Dano: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move2)?.power ?? '—'
+                    }}</strong></span>
+                <span class="m-stat">Acc: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move2)?.accuracy ?
+                    getMoveInfo(teamMembers()[slotIdx]?.move2)?.accuracy + '%' : '—' }}</strong></span>
               </div>
             </div>
 
             <!-- Move 3 -->
-            <div 
-              class="move-rich-chip" 
-              [class.empty]="!teamMembers()[slotIdx]?.move3"
+            <div class="move-rich-chip" [class.empty]="!teamMembers()[slotIdx]?.move3"
               (click)="openMoveInfoModal(teamMembers()[slotIdx]?.move3, $event)"
-              title="Clique para ver detalhes do golpe"
-            >
+              title="Clique para ver detalhes do golpe">
               <div class="m-top">
                 <span class="m-name">{{ teamMembers()[slotIdx]?.move3 || '— Golpe 3' }}</span>
-                <span *ngIf="teamMembers()[slotIdx]?.move3" class="type-badge micro" [ngClass]="'type-' + (getMoveInfo(teamMembers()[slotIdx]?.move3)?.type || 'normal')">
+                <span *ngIf="teamMembers()[slotIdx]?.move3" class="type-badge micro"
+                  [ngClass]="'type-' + (getMoveInfo(teamMembers()[slotIdx]?.move3)?.type || 'normal')">
                   {{ getMoveInfo(teamMembers()[slotIdx]?.move3)?.type || 'normal' }}
                 </span>
               </div>
               <div *ngIf="teamMembers()[slotIdx]?.move3" class="m-details-row">
                 <span class="m-cat">
-                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move3)?.category === 'physical'" class="ph-bold ph-sword"></i>
-                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move3)?.category === 'special'" class="ph-bold ph-sparkle"></i>
-                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move3)?.category === 'status'" class="ph-bold ph-shield-check"></i>
+                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move3)?.category === 'physical'"
+                    class="ph-bold ph-sword"></i>
+                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move3)?.category === 'special'"
+                    class="ph-bold ph-sparkle"></i>
+                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move3)?.category === 'status'"
+                    class="ph-bold ph-shield-check"></i>
                   {{ getMoveInfo(teamMembers()[slotIdx]?.move3)?.category | titlecase }}
                 </span>
-                <span class="m-stat">PP: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move3)?.pp ?? '—' }}</strong></span>
-                <span class="m-stat">Dano: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move3)?.power ?? '—' }}</strong></span>
-                <span class="m-stat">Acc: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move3)?.accuracy ? getMoveInfo(teamMembers()[slotIdx]?.move3)?.accuracy + '%' : '—' }}</strong></span>
+                <span class="m-stat">PP: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move3)?.pp ?? '—'
+                    }}</strong></span>
+                <span class="m-stat">Dano: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move3)?.power ?? '—'
+                    }}</strong></span>
+                <span class="m-stat">Acc: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move3)?.accuracy ?
+                    getMoveInfo(teamMembers()[slotIdx]?.move3)?.accuracy + '%' : '—' }}</strong></span>
               </div>
             </div>
 
             <!-- Move 4 -->
-            <div 
-              class="move-rich-chip" 
-              [class.empty]="!teamMembers()[slotIdx]?.move4"
+            <div class="move-rich-chip" [class.empty]="!teamMembers()[slotIdx]?.move4"
               (click)="openMoveInfoModal(teamMembers()[slotIdx]?.move4, $event)"
-              title="Clique para ver detalhes do golpe"
-            >
+              title="Clique para ver detalhes do golpe">
               <div class="m-top">
                 <span class="m-name">{{ teamMembers()[slotIdx]?.move4 || '— Golpe 4' }}</span>
-                <span *ngIf="teamMembers()[slotIdx]?.move4" class="type-badge micro" [ngClass]="'type-' + (getMoveInfo(teamMembers()[slotIdx]?.move4)?.type || 'normal')">
+                <span *ngIf="teamMembers()[slotIdx]?.move4" class="type-badge micro"
+                  [ngClass]="'type-' + (getMoveInfo(teamMembers()[slotIdx]?.move4)?.type || 'normal')">
                   {{ getMoveInfo(teamMembers()[slotIdx]?.move4)?.type || 'normal' }}
                 </span>
               </div>
               <div *ngIf="teamMembers()[slotIdx]?.move4" class="m-details-row">
                 <span class="m-cat">
-                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move4)?.category === 'physical'" class="ph-bold ph-sword"></i>
-                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move4)?.category === 'special'" class="ph-bold ph-sparkle"></i>
-                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move4)?.category === 'status'" class="ph-bold ph-shield-check"></i>
+                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move4)?.category === 'physical'"
+                    class="ph-bold ph-sword"></i>
+                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move4)?.category === 'special'"
+                    class="ph-bold ph-sparkle"></i>
+                  <i *ngIf="getMoveInfo(teamMembers()[slotIdx]?.move4)?.category === 'status'"
+                    class="ph-bold ph-shield-check"></i>
                   {{ getMoveInfo(teamMembers()[slotIdx]?.move4)?.category | titlecase }}
                 </span>
-                <span class="m-stat">PP: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move4)?.pp ?? '—' }}</strong></span>
-                <span class="m-stat">Dano: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move4)?.power ?? '—' }}</strong></span>
-                <span class="m-stat">Acc: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move4)?.accuracy ? getMoveInfo(teamMembers()[slotIdx]?.move4)?.accuracy + '%' : '—' }}</strong></span>
+                <span class="m-stat">PP: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move4)?.pp ?? '—'
+                    }}</strong></span>
+                <span class="m-stat">Dano: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move4)?.power ?? '—'
+                    }}</strong></span>
+                <span class="m-stat">Acc: <strong>{{ getMoveInfo(teamMembers()[slotIdx]?.move4)?.accuracy ?
+                    getMoveInfo(teamMembers()[slotIdx]?.move4)?.accuracy + '%' : '—' }}</strong></span>
               </div>
             </div>
           </div>
@@ -261,7 +286,8 @@
         <div class="avail-title">
           <h2><i class="ph-bold ph-list-plus"></i> Pokémon Disponíveis para Escolha</h2>
           <span class="avail-sub">
-            Exibindo Pokédex Regional de <strong>{{ getGameName(selectedGame()) }}</strong> (Exclusivos opostos removidos)
+            Exibindo Pokédex Regional de <strong>{{ getGameName(selectedGame()) }}</strong> (Exclusivos opostos
+            removidos)
           </span>
         </div>
 
@@ -270,22 +296,12 @@
           <!-- Search Input -->
           <div class="avail-search-bar">
             <i class="ph-bold ph-magnifying-glass search-icon"></i>
-            <input 
-              type="text" 
-              class="search-input" 
-              placeholder="Buscar Pokémon..."
-              [ngModel]="searchQuery()" 
-              (ngModelChange)="onSearchChange($event)"
-              (keydown.enter)="onPokemonSearchEnter($event)"
-            />
+            <input type="text" class="search-input" placeholder="Buscar Pokémon..." [ngModel]="searchQuery()"
+              (ngModelChange)="onSearchChange($event)" (keydown.enter)="onPokemonSearchEnter($event)" />
           </div>
 
           <!-- Type Select Dropdown -->
-          <select 
-            class="type-select-dropdown" 
-            [ngModel]="selectedType()" 
-            (ngModelChange)="onTypeFilterChange($event)"
-          >
+          <select class="type-select-dropdown" [ngModel]="selectedType()" (ngModelChange)="onTypeFilterChange($event)">
             <option value="">Todos os Tipos</option>
             <option *ngFor="let t of pokemonTypesList" [value]="t">
               Tipo: {{ t | titlecase }}
@@ -307,21 +323,14 @@
       </div>
 
       <!-- Available Cards Grid with INFINITE SCROLL listener -->
-      <div 
-        *ngIf="availablePokemons().length > 0" 
-        class="available-grid"
-        (scroll)="onAvailableScroll($event)"
-      >
-        <div 
-          *ngFor="let p of availablePokemons()" 
-          class="avail-pokemon-card" 
-          (click)="onSelectPokemonFromList(p)"
-        >
+      <div *ngIf="availablePokemons().length > 0" class="available-grid" (scroll)="onAvailableScroll($event)">
+        <div *ngFor="let p of availablePokemons()" class="avail-pokemon-card" (click)="onSelectPokemonFromList(p)">
           <img [src]="getPokemonSpriteUrl(p)" [alt]="p.name" class="avail-sprite" />
           <span class="avail-id">#{{ p.id.toString().padStart(4, '0') }}</span>
           <h4 class="avail-name">{{ p.name }}</h4>
           <div class="avail-types">
-            <span *ngFor="let t of p.types" class="type-badge tiny" [ngClass]="'type-' + t.type.name">{{ t.type.name }}</span>
+            <span *ngFor="let t of p.types" class="type-badge tiny" [ngClass]="'type-' + t.type.name">{{ t.type.name
+              }}</span>
           </div>
           <button class="add-to-team-btn">
             <i class="ph-bold ph-plus"></i> Escolher
@@ -353,12 +362,8 @@
       </div>
 
       <div class="slots-choice-grid">
-        <div 
-          *ngFor="let slotIdx of [0, 1, 2, 3, 4, 5]" 
-          class="slot-choice-card"
-          [class.occupied]="teamMembers()[slotIdx] !== null"
-          (click)="confirmSlotAssignment(slotIdx)"
-        >
+        <div *ngFor="let slotIdx of [0, 1, 2, 3, 4, 5]" class="slot-choice-card"
+          [class.occupied]="teamMembers()[slotIdx] !== null" (click)="confirmSlotAssignment(slotIdx)">
           <div class="choice-header">
             <span class="choice-num">Slot #{{ slotIdx + 1 }}</span>
             <span *ngIf="teamMembers()[slotIdx]" class="choice-status occupied">Ocupado</span>
@@ -366,8 +371,10 @@
           </div>
 
           <div *ngIf="teamMembers()[slotIdx]" class="choice-body">
-            <img [src]="teamMembers()[slotIdx]?.spriteUrl" [alt]="teamMembers()[slotIdx]?.pokemonName" class="choice-sprite" />
-            <span class="choice-name">{{ teamMembers()[slotIdx]?.nickname || teamMembers()[slotIdx]?.pokemonName }}</span>
+            <img [src]="teamMembers()[slotIdx]?.spriteUrl" [alt]="teamMembers()[slotIdx]?.pokemonName"
+              class="choice-sprite" />
+            <span class="choice-name">{{ teamMembers()[slotIdx]?.nickname || teamMembers()[slotIdx]?.pokemonName
+              }}</span>
           </div>
 
           <div *ngIf="!teamMembers()[slotIdx]" class="choice-body empty">
@@ -386,7 +393,8 @@
 
       <div class="modal-header center">
         <h2><i class="ph-bold ph-sparkle"></i> Configurações Salvas Encontradas</h2>
-        <p>Você possui <strong>{{ matchingSavedPresets().length }}</strong> versão(ões) salva(s) deste Pokémon na sua biblioteca. Deseja utilizar uma das suas preferências pré-configuradas?</p>
+        <p>Você possui <strong>{{ matchingSavedPresets().length }}</strong> versão(ões) salva(s) deste Pokémon na sua
+          biblioteca. Deseja utilizar uma das suas preferências pré-configuradas?</p>
       </div>
 
       <div class="presets-grid">
@@ -429,7 +437,7 @@
     </div>
   </div>
 
-  <!-- MODAL 2: POKÉMON CUSTOMIZATION MODAL (Apelido, Nature, Stats com Indicadores Red ▲ / Blue ▼) -->
+  <!-- MODAL 2: POKÉMON CUSTOMIZATION MODAL (Apelido, Nature, Stats com Indicadores  ▲ / Blue ▼) -->
   <div *ngIf="showCustomizeModal()" class="modal-backdrop" (click)="closeCustomizeModal()">
     <div class="modal-card customize-modal" (click)="$event.stopPropagation()">
       <button class="close-modal-btn" (click)="closeCustomizeModal()"><i class="ph-bold ph-x"></i></button>
@@ -451,12 +459,8 @@
         <!-- Nickname Field -->
         <div class="form-field">
           <label><i class="ph-bold ph-tag"></i> Apelido (Nickname):</label>
-          <input 
-            type="text" 
-            class="text-input" 
-            placeholder="Nome do Pokémon..."
-            [(ngModel)]="editingMember()!.nickname"
-          />
+          <input type="text" class="text-input" placeholder="Nome do Pokémon..."
+            [(ngModel)]="editingMember()!.nickname" />
         </div>
 
         <!-- Nature Field -->
@@ -469,7 +473,7 @@
           </select>
         </div>
 
-        <!-- BASE STATS PANEL WITH NATURE MODIFIERS (RED ▲ BOOSTED / BLUE ▼ PENALIZED) -->
+        <!-- BASE STATS PANEL WITH NATURE MODIFIERS ( ▲ BOOSTED / BLUE ▼ PENALIZED) -->
         <div *ngIf="inspectingPokemonDetails()?.stats" class="form-field full-width">
           <label><i class="ph-bold ph-chart-bar"></i> Estatísticas Base & Modificadores da Nature:</label>
           <div class="base-stats-nature-box">
@@ -477,35 +481,27 @@
               <div class="stat-name-label">
                 <span>{{ getStatLabelPt(st.stat.name) }}</span>
                 <!-- Nature Modifier Badge -->
-                <span 
-                  *ngIf="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'boosted'" 
-                  class="nature-modifier-chip boosted"
-                >
+                <span *ngIf="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'boosted'"
+                  class="nature-modifier-chip boosted">
                   <i class="ph-bold ph-arrow-up"></i> +10%
                 </span>
-                <span 
-                  *ngIf="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'penalized'" 
-                  class="nature-modifier-chip penalized"
-                >
+                <span *ngIf="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'penalized'"
+                  class="nature-modifier-chip penalized">
                   <i class="ph-bold ph-arrow-down"></i> -10%
                 </span>
               </div>
 
-              <span 
-                class="stat-val-num"
+              <span class="stat-val-num"
                 [class.boosted]="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'boosted'"
-                [class.penalized]="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'penalized'"
-              >
+                [class.penalized]="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'penalized'">
                 {{ st.base_stat }}
               </span>
 
               <div class="stat-bar-track">
-                <div 
-                  class="stat-bar-fill" 
-                  [style.width.%]="(st.base_stat / 255) * 100"
+                <div class="stat-bar-fill" [style.width.%]="(st.base_stat / 255) * 100"
                   [class.boosted]="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'boosted'"
-                  [class.penalized]="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'penalized'"
-                ></div>
+                  [class.penalized]="getNatureStatModifier(st.stat.name, editingMember()?.nature) === 'penalized'">
+                </div>
               </div>
             </div>
           </div>
@@ -515,18 +511,16 @@
         <div class="form-field full-width">
           <label><i class="ph-bold ph-star"></i> Escolha a Habilidade (com Descrição):</label>
           <div class="abilities-cards-grid">
-            <div 
-              *ngFor="let a of inspectingPokemonDetails()?.abilities" 
-              class="ability-card-item"
+            <div *ngFor="let a of inspectingPokemonDetails()?.abilities" class="ability-card-item"
               [class.selected]="editingMember()?.abilityName === a.ability.name"
-              (click)="selectAbility(a.ability.name)"
-            >
+              (click)="selectAbility(a.ability.name)">
               <div class="ab-card-header">
                 <span class="ab-name">{{ a.ability.name }}</span>
                 <span class="ab-tag" [class.hidden]="a.is_hidden">
                   {{ a.is_hidden ? 'Habilidade Oculta' : 'Normal' }}
                 </span>
-                <i *ngIf="editingMember()?.abilityName === a.ability.name" class="ph-bold ph-check-circle check-icon"></i>
+                <i *ngIf="editingMember()?.abilityName === a.ability.name"
+                  class="ph-bold ph-check-circle check-icon"></i>
               </div>
               <p class="ab-desc">{{ a.ability.descriptionPt || a.ability.descriptionEn || 'Sem descrição' }}</p>
             </div>
@@ -536,7 +530,7 @@
         <!-- 4 Moves Buttons (Opens Moves Picker Modal) -->
         <div class="form-field full-width">
           <label><i class="ph-bold ph-sword"></i> 4 Golpes da Equipe (Clique para escolher):</label>
-          
+
           <div class="moves-interactive-slots-grid">
             <!-- Move Slot 1 -->
             <div class="move-slot-picker-btn" (click)="openMovePicker(0)">
@@ -544,7 +538,8 @@
               <span class="m-slot-val" [class.empty]="!editingMember()?.move1">
                 {{ editingMember()?.move1 || '+ Escolher Golpe 1' }}
               </span>
-              <button *ngIf="editingMember()?.move1" class="clear-m-btn" (click)="clearMoveSlot(0, $event)" title="Limpar Golpe">
+              <button *ngIf="editingMember()?.move1" class="clear-m-btn" (click)="clearMoveSlot(0, $event)"
+                title="Limpar Golpe">
                 <i class="ph-bold ph-x"></i>
               </button>
             </div>
@@ -555,7 +550,8 @@
               <span class="m-slot-val" [class.empty]="!editingMember()?.move2">
                 {{ editingMember()?.move2 || '+ Escolher Golpe 2' }}
               </span>
-              <button *ngIf="editingMember()?.move2" class="clear-m-btn" (click)="clearMoveSlot(1, $event)" title="Limpar Golpe">
+              <button *ngIf="editingMember()?.move2" class="clear-m-btn" (click)="clearMoveSlot(1, $event)"
+                title="Limpar Golpe">
                 <i class="ph-bold ph-x"></i>
               </button>
             </div>
@@ -566,7 +562,8 @@
               <span class="m-slot-val" [class.empty]="!editingMember()?.move3">
                 {{ editingMember()?.move3 || '+ Escolher Golpe 3' }}
               </span>
-              <button *ngIf="editingMember()?.move3" class="clear-m-btn" (click)="clearMoveSlot(2, $event)" title="Limpar Golpe">
+              <button *ngIf="editingMember()?.move3" class="clear-m-btn" (click)="clearMoveSlot(2, $event)"
+                title="Limpar Golpe">
                 <i class="ph-bold ph-x"></i>
               </button>
             </div>
@@ -577,7 +574,8 @@
               <span class="m-slot-val" [class.empty]="!editingMember()?.move4">
                 {{ editingMember()?.move4 || '+ Escolher Golpe 4' }}
               </span>
-              <button *ngIf="editingMember()?.move4" class="clear-m-btn" (click)="clearMoveSlot(3, $event)" title="Limpar Golpe">
+              <button *ngIf="editingMember()?.move4" class="clear-m-btn" (click)="clearMoveSlot(3, $event)"
+                title="Limpar Golpe">
                 <i class="ph-bold ph-x"></i>
               </button>
             </div>
@@ -606,32 +604,16 @@
 
       <!-- Moves Learning Method Tabs -->
       <div class="moves-tabs-bar">
-        <button 
-          class="tab-btn" 
-          [class.active]="movePickerTab() === 'levelUp'" 
-          (click)="setMovePickerTab('levelUp')"
-        >
+        <button class="tab-btn" [class.active]="movePickerTab() === 'levelUp'" (click)="setMovePickerTab('levelUp')">
           Por Nível
         </button>
-        <button 
-          class="tab-btn" 
-          [class.active]="movePickerTab() === 'tm'" 
-          (click)="setMovePickerTab('tm')"
-        >
+        <button class="tab-btn" [class.active]="movePickerTab() === 'tm'" (click)="setMovePickerTab('tm')">
           Por TM / HM
         </button>
-        <button 
-          class="tab-btn" 
-          [class.active]="movePickerTab() === 'egg'" 
-          (click)="setMovePickerTab('egg')"
-        >
+        <button class="tab-btn" [class.active]="movePickerTab() === 'egg'" (click)="setMovePickerTab('egg')">
           Por Ovos (Egg)
         </button>
-        <button 
-          class="tab-btn" 
-          [class.active]="movePickerTab() === 'tutor'" 
-          (click)="setMovePickerTab('tutor')"
-        >
+        <button class="tab-btn" [class.active]="movePickerTab() === 'tutor'" (click)="setMovePickerTab('tutor')">
           Por Tutor
         </button>
       </div>
@@ -639,32 +621,23 @@
       <!-- Move Search Bar Inside Modal WITH AUTO-FOCUS & KEYBOARD NAV -->
       <div class="move-search-box">
         <i class="ph-bold ph-magnifying-glass"></i>
-        <input 
-          #moveSearchInput
-          type="text" 
-          class="text-input" 
-          placeholder="Digite para buscar o golpe imediatamente..."
-          [ngModel]="movePickerSearch()"
-          (ngModelChange)="onMoveSearchChange($event)"
-          (keydown)="onMovePickerKeydown($event)"
-        />
+        <input #moveSearchInput type="text" class="text-input" placeholder="Digite para buscar o golpe imediatamente..."
+          [ngModel]="movePickerSearch()" (ngModelChange)="onMoveSearchChange($event)"
+          (keydown)="onMovePickerKeydown($event)" />
       </div>
 
       <!-- Split Layout: Moves Table List + Preview Detail Card -->
       <div class="moves-picker-split-view">
-        
+
         <!-- Left: Moves List -->
         <div class="moves-list-col">
           <div *ngIf="getFilteredMovesForTab().length === 0" class="no-moves-msg">
             <p>Nenhum golpe encontrado nesta categoria.</p>
           </div>
 
-          <div 
-            *ngFor="let m of getFilteredMovesForTab(); let idx = index" 
-            class="move-row-item"
+          <div *ngFor="let m of getFilteredMovesForTab(); let idx = index" class="move-row-item"
             [class.active]="selectedPreviewMove()?.name === m.name || highlightedMoveIndex() === idx"
-            (click)="selectPreviewMove(m, idx)"
-          >
+            (click)="selectPreviewMove(m, idx)">
             <div class="m-left">
               <span *ngIf="movePickerTab() === 'levelUp'" class="m-lvl">Lvl {{ m.level || 1 }}</span>
               <span class="m-name">{{ m.name }}</span>
@@ -702,7 +675,8 @@
               </div>
               <div class="stat-pill">
                 <span class="lbl">Precisão:</span>
-                <span class="val">{{ selectedPreviewMove()?.accuracy ? selectedPreviewMove()?.accuracy + '%' : '—' }}</span>
+                <span class="val">{{ selectedPreviewMove()?.accuracy ? selectedPreviewMove()?.accuracy + '%' : '—'
+                  }}</span>
               </div>
               <div class="stat-pill">
                 <span class="lbl">PP:</span>
@@ -712,7 +686,8 @@
 
             <div class="prev-desc-box">
               <h4>Descrição do Golpe:</h4>
-              <p>{{ selectedPreviewMove()?.descriptionPt || selectedPreviewMove()?.description || 'Sem descrição.' }}</p>
+              <p>{{ selectedPreviewMove()?.descriptionPt || selectedPreviewMove()?.description || 'Sem descrição.' }}
+              </p>
             </div>
 
             <button class="select-this-move-btn" (click)="confirmSelectedMove()">
@@ -753,9 +728,12 @@
         </div>
 
         <div class="info-stats-grid">
-          <div class="info-stat-card"><span class="lbl">Poder</span><span class="val">{{ infoModalData()?.power ?? '—' }}</span></div>
-          <div class="info-stat-card"><span class="lbl">Precisão</span><span class="val">{{ infoModalData()?.accuracy ? infoModalData()?.accuracy + '%' : '—' }}</span></div>
-          <div class="info-stat-card"><span class="lbl">PP</span><span class="val">{{ infoModalData()?.pp ?? '—' }}</span></div>
+          <div class="info-stat-card"><span class="lbl">Poder</span><span class="val">{{ infoModalData()?.power ?? '—'
+              }}</span></div>
+          <div class="info-stat-card"><span class="lbl">Precisão</span><span class="val">{{ infoModalData()?.accuracy ?
+              infoModalData()?.accuracy + '%' : '—' }}</span></div>
+          <div class="info-stat-card"><span class="lbl">PP</span><span class="val">{{ infoModalData()?.pp ?? '—'
+              }}</span></div>
         </div>
 
         <div class="info-desc-box">

@@ -9,6 +9,7 @@ import { RegisterComponent } from './components/register/register';
 import { authGuard } from './guards/auth.guard';
 
 import { SavedPokemonListComponent } from './components/saved-pokemon-list/saved-pokemon-list';
+import { ProfileComponent } from './components/profile/profile';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'pokedex', pathMatch: 'full' },
@@ -16,6 +17,7 @@ export const routes: Routes = [
   { path: 'pokemon/:idOrName', component: PokemonFullDetailComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'team-builder', component: TeamBuilderComponent, canActivate: [authGuard] },
   { path: 'team-builder/new', component: TeamCreatorComponent, canActivate: [authGuard] },
   { path: 'team-builder/edit/:id', component: TeamCreatorComponent, canActivate: [authGuard] },

@@ -84,4 +84,16 @@ export class TeamBuilderComponent implements OnInit {
     const g = this.availableGames().find(item => item.id === gameId);
     return g ? g.name : gameId;
   }
+
+  onCoverError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img) {
+      img.style.display = 'none';
+      const parent = img.parentElement;
+      if (parent) {
+        const fallback = parent.querySelector('.cover-fallback-icon') as HTMLElement;
+        if (fallback) fallback.style.display = 'inline-flex';
+      }
+    }
+  }
 }

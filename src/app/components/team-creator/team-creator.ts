@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -85,6 +85,54 @@ export class TeamCreatorComponent implements OnInit {
   readonly naturesList: PokemonNature[] = POKEMON_NATURES;
   movesCache = signal<Record<string, any>>({});
 
+  gamesByGen = computed(() => {
+    const games = this.availableGames().filter(g => g.id !== 'geral');
+    const genMap = new Map<number, GameVersionItem[]>();
+
+    for (const g of games) {
+      const list = genMap.get(g.gen) || [];
+      list.push(g);
+      genMap.set(g.gen, list);
+    }
+
+    const result: { gen: number; genTitle: string; games: GameVersionItem[] }[] = [];
+    const genTitles: Record<number, string> = {
+      1: '1ª Geração (Kanto)',
+      2: '2ª Geração (Johto)',
+      3: '3ª Geração (Hoenn / Kanto Remakes)',
+      4: '4ª Geração (Sinnoh / Johto Remakes)',
+      5: '5ª Geração (Unova)',
+      6: '6ª Geração (Kalos)',
+      7: '7ª Geração (Alola)',
+      8: '8ª Geração (Galar / Sinnoh Remakes)',
+      9: '9ª Geração (Paldea)'
+    };
+
+    for (let g = 1; g <= 9; g++) {
+      if (genMap.has(g)) {
+        result.push({
+          gen: g,
+          genTitle: genTitles[g] || `${g}ª Geração`,
+          games: genMap.get(g)!
+        });
+      }
+    }
+
+    return result;
+  });
+
+  onCoverError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img) {
+      img.style.display = 'none';
+      const parent = img.parentElement;
+      if (parent) {
+        const fallback = parent.querySelector('.cover-fallback-icon') as HTMLElement;
+        if (fallback) fallback.style.display = 'flex';
+      }
+    }
+  }
+
   ngOnInit(): void {
     this.loadInitialData();
   }
@@ -107,17 +155,17 @@ export class TeamCreatorComponent implements OnInit {
   loadInitialData(): void {
     this.pokeApiService.getGames().subscribe({
       next: (games: GameVersionItem[]) => this.availableGames.set(games),
-      error: () => {}
+      error: () => { }
     });
 
     this.teamService.getTeams().subscribe({
       next: (teams) => this.userTeams.set(teams),
-      error: () => {}
+      error: () => { }
     });
 
     this.savedPokemonService.getSavedPokemons().subscribe({
       next: (saved) => this.userSavedPokemons.set(saved),
-      error: () => {}
+      error: () => { }
     });
 
     this.route.paramMap.subscribe(params => {
@@ -138,7 +186,7 @@ export class TeamCreatorComponent implements OnInit {
       next: (team) => {
         this.selectedGame.set(team.gameVersion || 'geral');
         this.teamNameInput.set(team.name);
-        
+
         const slots: (TeamMemberData | null)[] = [null, null, null, null, null, null];
         if (team.members) {
           team.members.forEach(m => {
@@ -194,6 +242,19 @@ export class TeamCreatorComponent implements OnInit {
     }
   }
 
+  suggestDefaultTeamName(gameId: string): void {
+    const existingForGame = this.userTeams().filter(t => (t.gameVersion || 'geral') === gameId);
+    const count = existingForGame.length + 1;
+
+    if (gameId === 'geral') {
+      this.teamNameInput.set(`Time #${count}`);
+    } else {
+      const gameObj = this.availableGames().find(g => g.id === gameId);
+      const gameLabel = gameObj ? gameObj.name : gameId;
+      this.teamNameInput.set(`${gameLabel} #${count}`);
+    }
+  }
+
   goToStep2(): void {
     if (!this.teamNameInput()) {
       this.suggestDefaultTeamName(this.selectedGame());
@@ -214,19 +275,6 @@ export class TeamCreatorComponent implements OnInit {
       }
     }
     this.currentStep.set(1);
-  }
-
-  suggestDefaultTeamName(gameId: string): void {
-    const existingForGame = this.userTeams().filter(t => (t.gameVersion || 'geral') === gameId);
-    const count = existingForGame.length + 1;
-
-    if (gameId === 'geral') {
-      this.teamNameInput.set(`Time #${count}`);
-    } else {
-      const gameObj = this.availableGames().find(g => g.id === gameId);
-      const gameLabel = gameObj ? gameObj.name : gameId;
-      this.teamNameInput.set(`${gameLabel} #${count}`);
-    }
   }
 
   getGameName(gameId: string | null | undefined): string {
@@ -355,7 +403,7 @@ export class TeamCreatorComponent implements OnInit {
         }
       }
       currentSlots[targetSlotIdx] = this.createDefaultMemberData(pokemon, targetSlotIdx + 1);
-    } 
+    }
     // Case 3: Target slot is empty -> Simply place it!
     else {
       currentSlots[targetSlotIdx] = this.createDefaultMemberData(pokemon, targetSlotIdx + 1);
@@ -454,7 +502,7 @@ export class TeamCreatorComponent implements OnInit {
     this.pokeApiService.getPokemonDetails(member.pokemonId).subscribe({
       next: (details) => {
         this.inspectingPokemonDetails.set(details);
-        
+
         if (details && details.moves) {
           const allMoves: any[] = [
             ...(details.moves.levelUp || []),
@@ -533,7 +581,7 @@ export class TeamCreatorComponent implements OnInit {
     this.movePickerTab.set('levelUp');
     this.movePickerSearch.set('');
     this.highlightedMoveIndex.set(-1);
-    
+
     const member = this.editingMember();
     const moveKey = `move${moveSlotIndex + 1}` as 'move1' | 'move2' | 'move3' | 'move4';
     const currentMoveName = member ? member[moveKey] : null;

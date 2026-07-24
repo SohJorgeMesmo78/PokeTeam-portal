@@ -175,7 +175,7 @@ export class PokeApiService {
    * Get official artwork image URL by ID.
    */
   getOfficialArtworkUrl(id: number): string {
-    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
   }
 
   /**

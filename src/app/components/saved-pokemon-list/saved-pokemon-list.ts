@@ -794,7 +794,7 @@ export class SavedPokemonListComponent implements OnInit {
 
     const items: ImportItem[] = selectedMembers.map(m => {
       const defaultName = `${m.pokemonName} #${team.name}`;
-      
+
       const existingIdentical = this.savedPokemons().filter(sp =>
         sp.pokemonId === m.pokemonId &&
         sp.nature === m.nature &&
