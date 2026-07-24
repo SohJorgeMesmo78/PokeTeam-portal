@@ -75,6 +75,7 @@ export class TeamCreatorComponent implements OnInit {
   movePickerTab = signal<string>('levelUp'); // 'levelUp' | 'tm' | 'egg' | 'tutor'
   movePickerSearch = signal<string>('');
   selectedPreviewMove = signal<any | null>(null);
+  highlightedMoveIndex = signal<number>(-1);
 
   // Modal 4: Generic Info Detail Modal
   showInfoDetailModal = signal<boolean>(false);
@@ -531,6 +532,7 @@ export class TeamCreatorComponent implements OnInit {
     this.activeMoveSlotIndex.set(moveSlotIndex);
     this.movePickerTab.set('levelUp');
     this.movePickerSearch.set('');
+    this.highlightedMoveIndex.set(-1);
     
     const member = this.editingMember();
     const moveKey = `move${moveSlotIndex + 1}` as 'move1' | 'move2' | 'move3' | 'move4';
@@ -560,6 +562,48 @@ export class TeamCreatorComponent implements OnInit {
     this.showMovePickerModal.set(false);
     this.activeMoveSlotIndex.set(null);
     this.selectedPreviewMove.set(null);
+    this.highlightedMoveIndex.set(-1);
+  }
+
+  setMovePickerTab(tab: string): void {
+    this.movePickerTab.set(tab);
+    this.highlightedMoveIndex.set(-1);
+  }
+
+  onMoveSearchChange(val: string): void {
+    this.movePickerSearch.set(val);
+    this.highlightedMoveIndex.set(-1);
+
+    const search = val.trim().toLowerCase();
+    if (!search) {
+      this.movePickerTab.set('levelUp');
+      return;
+    }
+
+    const movesObj = this.inspectingPokemonDetails()?.moves;
+    if (!movesObj) return;
+
+    // Check if current tab has matches
+    const currentTab = this.movePickerTab();
+    const currentList = movesObj[currentTab] || [];
+    const currentMatches = currentList.filter((m: any) =>
+      m.name.toLowerCase().includes(search) || (m.type && m.type.toLowerCase().includes(search))
+    );
+
+    if (currentMatches.length === 0) {
+      // Search tabs in priority order: levelUp -> tm -> egg -> tutor
+      const tabs: ('levelUp' | 'tm' | 'egg' | 'tutor')[] = ['levelUp', 'tm', 'egg', 'tutor'];
+      for (const t of tabs) {
+        const list = movesObj[t] || [];
+        const matches = list.filter((m: any) =>
+          m.name.toLowerCase().includes(search) || (m.type && m.type.toLowerCase().includes(search))
+        );
+        if (matches.length > 0) {
+          this.movePickerTab.set(t);
+          break;
+        }
+      }
+    }
   }
 
   scrollToAvailableSection(): void {
@@ -577,7 +621,10 @@ export class TeamCreatorComponent implements OnInit {
     }
   }
 
-  selectPreviewMove(moveItem: any): void {
+  selectPreviewMove(moveItem: any, index?: number): void {
+    if (index !== undefined) {
+      this.highlightedMoveIndex.set(index);
+    }
     if (this.selectedPreviewMove()?.name === moveItem.name) {
       this.confirmSelectedMove();
       return;
@@ -585,13 +632,50 @@ export class TeamCreatorComponent implements OnInit {
     this.selectedPreviewMove.set(moveItem);
   }
 
-  onMoveSearchEnter(event: Event): void {
-    event.preventDefault();
+  onMovePickerKeydown(event: KeyboardEvent): void {
     const moves = this.getFilteredMovesForTab();
-    if (moves.length === 1 && moves[0]) {
-      this.selectedPreviewMove.set(moves[0]);
-      this.confirmSelectedMove();
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if (moves.length === 0) return;
+      let idx = this.highlightedMoveIndex() + 1;
+      if (idx >= moves.length) idx = moves.length - 1;
+      this.highlightedMoveIndex.set(idx);
+      const move = moves[idx];
+      if (move) {
+        this.selectedPreviewMove.set(move);
+        this.scrollToMoveRow(idx);
+      }
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (moves.length === 0) return;
+      let idx = this.highlightedMoveIndex() - 1;
+      if (idx < 0) idx = 0;
+      this.highlightedMoveIndex.set(idx);
+      const move = moves[idx];
+      if (move) {
+        this.selectedPreviewMove.set(move);
+        this.scrollToMoveRow(idx);
+      }
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      const selected = this.selectedPreviewMove();
+      if (selected) {
+        this.confirmSelectedMove();
+      } else if (moves.length === 1 && moves[0]) {
+        this.selectedPreviewMove.set(moves[0]);
+        this.confirmSelectedMove();
+      }
     }
+  }
+
+  scrollToMoveRow(index: number): void {
+    setTimeout(() => {
+      const rows = document.querySelectorAll('.moves-list-col .move-row-item');
+      if (rows[index]) {
+        rows[index].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }, 10);
   }
 
   confirmSelectedMove(): void {

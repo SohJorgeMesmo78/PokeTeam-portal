@@ -609,34 +609,34 @@
         <button 
           class="tab-btn" 
           [class.active]="movePickerTab() === 'levelUp'" 
-          (click)="movePickerTab.set('levelUp')"
+          (click)="setMovePickerTab('levelUp')"
         >
           Por Nível
         </button>
         <button 
           class="tab-btn" 
           [class.active]="movePickerTab() === 'tm'" 
-          (click)="movePickerTab.set('tm')"
+          (click)="setMovePickerTab('tm')"
         >
           Por TM / HM
         </button>
         <button 
           class="tab-btn" 
           [class.active]="movePickerTab() === 'egg'" 
-          (click)="movePickerTab.set('egg')"
+          (click)="setMovePickerTab('egg')"
         >
           Por Ovos (Egg)
         </button>
         <button 
           class="tab-btn" 
           [class.active]="movePickerTab() === 'tutor'" 
-          (click)="movePickerTab.set('tutor')"
+          (click)="setMovePickerTab('tutor')"
         >
           Por Tutor
         </button>
       </div>
 
-      <!-- Move Search Bar Inside Modal WITH AUTO-FOCUS #moveSearchInput -->
+      <!-- Move Search Bar Inside Modal WITH AUTO-FOCUS & KEYBOARD NAV -->
       <div class="move-search-box">
         <i class="ph-bold ph-magnifying-glass"></i>
         <input 
@@ -645,8 +645,8 @@
           class="text-input" 
           placeholder="Digite para buscar o golpe imediatamente..."
           [ngModel]="movePickerSearch()"
-          (ngModelChange)="movePickerSearch.set($event)"
-          (keydown.enter)="onMoveSearchEnter($event)"
+          (ngModelChange)="onMoveSearchChange($event)"
+          (keydown)="onMovePickerKeydown($event)"
         />
       </div>
 
@@ -660,10 +660,10 @@
           </div>
 
           <div 
-            *ngFor="let m of getFilteredMovesForTab()" 
+            *ngFor="let m of getFilteredMovesForTab(); let idx = index" 
             class="move-row-item"
-            [class.active]="selectedPreviewMove()?.name === m.name"
-            (click)="selectPreviewMove(m)"
+            [class.active]="selectedPreviewMove()?.name === m.name || highlightedMoveIndex() === idx"
+            (click)="selectPreviewMove(m, idx)"
           >
             <div class="m-left">
               <span *ngIf="movePickerTab() === 'levelUp'" class="m-lvl">Lvl {{ m.level || 1 }}</span>
