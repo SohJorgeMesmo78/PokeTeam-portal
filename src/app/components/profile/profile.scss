@@ -56,6 +56,7 @@
     .trainer-sprite {
       position: relative;
       z-index: 1;
+      bottom: 20px;
       /* Camada intermediária */
       height: 88%;
       max-height: 270px;
@@ -66,14 +67,14 @@
       transition: all 0.3s ease;
     }
 
-    /* Pokémon <= 17 (1,70m): Na FRENTE (z-index 2), à ESQUERDA (left: 8%) */
-    .pokemon-sprite.pokemon-small-front {
+    /* Pokémon Micro <= 10 (<= 1,00m): Na FRENTE (z-index 2), à ESQUERDA, tamanho pequeno (ex: Wattrel 0.4m) */
+    .pokemon-sprite.pokemon-micro-front {
       position: absolute;
-      left: -8px;
-      bottom: -40px;
+      left: -30px;
+      bottom: -50px;
       z-index: 2;
       /* Fica na FRENTE do treinador */
-      width: 180px;
+      width: 200px;
       height: auto;
       object-fit: contain;
       image-rendering: pixelated;
@@ -81,14 +82,44 @@
       transition: all 0.3s ease;
     }
 
-    /* Pokémon > 17 (> 1,70m): ATRÁS (z-index 0), à DIREITA (right: 4%) */
+    /* Pokémon Pequeno > 10 e <= 13 (1,01m a 1,30m): Na FRENTE (z-index 2), à ESQUERDA, tamanho médio (ex: Kilowattrel 1.4m) */
+    .pokemon-sprite.pokemon-small-front {
+      position: absolute;
+      left: -20px;
+      bottom: -30px;
+      z-index: 2;
+      /* Fica na FRENTE do treinador */
+      width: 200px;
+      height: auto;
+      object-fit: contain;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+      transition: all 0.3s ease;
+    }
+
+    /* Pokémon Médio > 13 e <= 17 (1,31m a 1,70m): Na FRENTE (z-index 2), à ESQUERDA, tamanho médio (ex: Kilowattrel 1.4m) */
+    .pokemon-sprite.pokemon-medium-front {
+      position: absolute;
+      left: 40px;
+      bottom: -30px;
+      z-index: 2;
+      /* Fica na FRENTE do treinador */
+      width: 250px;
+      height: auto;
+      object-fit: contain;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+      transition: all 0.3s ease;
+    }
+
+    /* Pokémon Grande > 17 (> 1,70m): ATRÁS (z-index 0), à DIREITA, tamanho grande */
     .pokemon-sprite.pokemon-large-back {
       position: absolute;
-      left: 4%;
+      left: -15px;
       bottom: 25px;
       z-index: 0;
       /* Fica ATRÁS do treinador */
-      width: 280px;
+      width: 300px;
       height: auto;
       object-fit: contain;
       image-rendering: pixelated;
@@ -570,12 +601,17 @@
     padding: 0.5rem 0.2rem;
 
     .loading-state,
+    .loading-more-state,
     .no-results {
       grid-column: 1 / -1;
       text-align: center;
-      padding: 2rem 0;
+      padding: 1.5rem 0;
       color: var(--text-secondary);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
     .pokemon-select-card {

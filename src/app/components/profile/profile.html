@@ -1,26 +1,20 @@
 <div class="profile-page-container">
   <div *ngIf="currentUser() as user" class="profile-card">
-    
+
     <!-- LEFT SIDE: Full-Body Avatar Vertical Rectangle -->
     <div class="profile-left-column">
       <div class="avatar-full-rectangle">
         <!-- Sprite do Treinador (Centralizada e em destaque) -->
-        <img 
-          [src]="selectedAvatar()" 
-          (error)="onAvatarError($event)" 
-          alt="Avatar do Treinador" 
-          class="trainer-sprite" 
-        />
+        <img [src]="selectedAvatar()" (error)="onAvatarError($event)" alt="Avatar do Treinador"
+          class="trainer-sprite" />
 
         <!-- Sprite do Pokémon Favorito (Se existir) -->
-        <img 
-          *ngIf="selectedFavPokemonSprite()" 
-          [src]="selectedFavPokemonSprite()" 
-          [alt]="selectedFavPokemonName() || 'Pokémon Favorito'" 
-          class="pokemon-sprite"
-          [class.pokemon-small-front]="(selectedFavPokemonHeight() ?? 0) <= 17"
-          [class.pokemon-large-back]="(selectedFavPokemonHeight() ?? 0) > 17"
-        />
+        <img *ngIf="selectedFavPokemonSprite()" [src]="selectedFavPokemonSprite()"
+          [alt]="selectedFavPokemonName() || 'Pokémon Favorito'" class="pokemon-sprite"
+          [class.pokemon-micro-front]="(selectedFavPokemonHeight() ?? 0) < 10"
+          [class.pokemon-small-front]="(selectedFavPokemonHeight() ?? 0) >= 10 && (selectedFavPokemonHeight() ?? 0) < 13"
+          [class.pokemon-medium-front]="(selectedFavPokemonHeight() ?? 0) >= 13 && (selectedFavPokemonHeight() ?? 0) < 17"
+          [class.pokemon-large-back]="(selectedFavPokemonHeight() ?? 0) >= 17" />
 
         <div class="avatar-overlay-gradient"></div>
       </div>
@@ -43,13 +37,8 @@
           <label for="profile-username">Nome de Usuário</label>
           <div class="input-wrapper">
             <i class="ph-bold ph-user input-icon"></i>
-            <input 
-              id="profile-username" 
-              type="text" 
-              [ngModel]="usernameInput()" 
-              (ngModelChange)="onUsernameInput($event)"
-              placeholder="Digite seu nome de usuário..." 
-            />
+            <input id="profile-username" type="text" [ngModel]="usernameInput()"
+              (ngModelChange)="onUsernameInput($event)" placeholder="Digite seu nome de usuário..." />
             <div *ngIf="checkingUsername()" class="spinner-icon">
               <i class="ph-bold ph-spinner spin"></i>
             </div>
@@ -88,7 +77,8 @@
                   <span class="fav-id">#{{ selectedFavPokemonId() | number: '3.0-0' }}</span>
                   <span class="fav-name">{{ selectedFavPokemonName() }}</span>
                 </div>
-                <button type="button" class="clear-fav-btn" (click)="clearFavoritePokemon($event)" title="Remover favorito">
+                <button type="button" class="clear-fav-btn" (click)="clearFavoritePokemon($event)"
+                  title="Remover favorito">
                   <i class="ph-bold ph-trash"></i>
                 </button>
               </div>
@@ -115,12 +105,7 @@
         </div>
 
         <!-- Botão Salvar (Habilitado apenas quando alterado e disponível) -->
-        <button 
-          type="button" 
-          class="save-profile-btn" 
-          [disabled]="isSaveDisabled()" 
-          (click)="saveProfile()"
-        >
+        <button type="button" class="save-profile-btn" [disabled]="isSaveDisabled()" (click)="saveProfile()">
           <span *ngIf="!saving()"><i class="ph-bold ph-floppy-disk"></i> Salvar Alterações</span>
           <span *ngIf="saving()" class="loading-wrap">
             <div class="pokeball-spinner-small"></div> Salvando...
@@ -142,20 +127,11 @@
 
     <!-- Gender Selector in Modal -->
     <div class="modal-gender-tabs">
-      <button 
-        type="button" 
-        class="tab-btn" 
-        [class.active]="avatarGenderTab() === 'boy'" 
-        (click)="setGenderTab('boy')"
-      >
+      <button type="button" class="tab-btn" [class.active]="avatarGenderTab() === 'boy'" (click)="setGenderTab('boy')">
         Treinadores
       </button>
-      <button 
-        type="button" 
-        class="tab-btn" 
-        [class.active]="avatarGenderTab() === 'girl'" 
-        (click)="setGenderTab('girl')"
-      >
+      <button type="button" class="tab-btn" [class.active]="avatarGenderTab() === 'girl'"
+        (click)="setGenderTab('girl')">
         Treinadoras
       </button>
     </div>
@@ -163,23 +139,15 @@
     <!-- Larger Avatar Options Grid -->
     <div class="modal-avatar-grid">
       <ng-container *ngIf="avatarGenderTab() === 'boy'">
-        <div 
-          *ngFor="let av of boyAvatars" 
-          class="avatar-card-item"
-          [class.active]="selectedAvatar() === av"
-          (click)="selectAvatarAndClose(av)"
-        >
+        <div *ngFor="let av of boyAvatars" class="avatar-card-item" [class.active]="selectedAvatar() === av"
+          (click)="selectAvatarAndClose(av)">
           <img [src]="av" [alt]="av" class="avatar-perfil modal-size" [class.selected]="selectedAvatar() === av" />
         </div>
       </ng-container>
 
       <ng-container *ngIf="avatarGenderTab() === 'girl'">
-        <div 
-          *ngFor="let av of girlAvatars" 
-          class="avatar-card-item"
-          [class.active]="selectedAvatar() === av"
-          (click)="selectAvatarAndClose(av)"
-        >
+        <div *ngFor="let av of girlAvatars" class="avatar-card-item" [class.active]="selectedAvatar() === av"
+          (click)="selectAvatarAndClose(av)">
           <img [src]="av" [alt]="av" class="avatar-perfil modal-size" [class.selected]="selectedAvatar() === av" />
         </div>
       </ng-container>
@@ -195,37 +163,30 @@
       <button class="close-modal-btn" (click)="closePokemonModal()"><i class="ph-bold ph-x"></i></button>
     </div>
 
-    <!-- Input de Pesquisa -->
+    <!-- Input de Pesquisa (Debounced) -->
     <div class="search-input-wrapper">
       <i class="ph-bold ph-magnifying-glass search-icon"></i>
-      <input 
-        type="text" 
-        placeholder="Pesquisar por nome ou ID..." 
-        [ngModel]="pokemonSearchQuery()" 
-        (ngModelChange)="searchPokemons($event)"
-      />
+      <input type="text" placeholder="Pesquisar por nome ou ID..." [ngModel]="pokemonSearchQuery()"
+        (ngModelChange)="onPokemonSearchInput($event)" />
     </div>
 
-    <!-- Grid de Pokémons -->
-    <div class="modal-pokemon-grid">
+    <!-- Grid de Pokémons (com Infinite Scroll) -->
+    <div class="modal-pokemon-grid" (scroll)="onModalGridScroll($event)">
       <div *ngIf="loadingPokemons()" class="loading-state">
         <div class="pokeball-spinner-small"></div> Buscando Pokédex...
       </div>
 
       <ng-container *ngIf="!loadingPokemons()">
-        <div 
-          *ngFor="let pk of searchResults()" 
-          class="pokemon-select-card"
-          [class.selected]="selectedFavPokemonId() === pk.id"
-          (click)="selectFavoritePokemon(pk)"
-        >
-          <img 
-            [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + pk.id + '.png'" 
-            [alt]="pk.name" 
-            class="pk-artwork"
-          />
+        <div *ngFor="let pk of searchResults()" class="pokemon-select-card"
+          [class.selected]="selectedFavPokemonId() === pk.id" (click)="selectFavoritePokemon(pk)">
+          <img [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + pk.id + '.png'"
+            [alt]="pk.name" class="pk-artwork" />
           <span class="pk-number">#{{ pk.id | number: '3.0-0' }}</span>
           <span class="pk-name">{{ pk.name }}</span>
+        </div>
+
+        <div *ngIf="loadingMorePokemons()" class="loading-more-state">
+          <div class="pokeball-spinner-small"></div> Carregando mais Pokémon...
         </div>
 
         <div *ngIf="searchResults().length === 0" class="no-results">

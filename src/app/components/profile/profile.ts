@@ -1,7 +1,8 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
 import { AuthService, User } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { PokeApiService } from '../../services/poke-api.service';
@@ -14,7 +15,7 @@ import { PokemonDetail } from '../../models/pokemon.model';
   templateUrl: './profile.html',
   styleUrl: './profile.scss'
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
   public authService = inject(AuthService);
   private pokeApiService = inject(PokeApiService);
   private toastService = inject(ToastService);
@@ -27,15 +28,23 @@ export class ProfileComponent implements OnInit {
   avatarGenderTab = signal<'boy' | 'girl'>('boy');
   showAvatarModal = signal<boolean>(false);
 
-  // Pokémon Favorito State
+  // Pokémon Favorito State & Infinite Scroll Search
   selectedFavPokemonId = signal<number | null>(null);
   selectedFavPokemonName = signal<string | null>(null);
   selectedFavPokemonSprite = signal<string | null>(null);
   selectedFavPokemonHeight = signal<number | null>(null);
+  
   showPokemonModal = signal<boolean>(false);
   pokemonSearchQuery = signal<string>('');
   searchResults = signal<PokemonDetail[]>([]);
   loadingPokemons = signal<boolean>(false);
+  loadingMorePokemons = signal<boolean>(false);
+  hasMorePokemons = signal<boolean>(true);
+
+  private pokemonOffset = 0;
+  private readonly pokemonLimit = 24;
+  private searchSubject = new Subject<string>();
+  private searchSub?: Subscription;
 
   saving = signal<boolean>(false);
   checkingUsername = signal<boolean>(false);
@@ -138,6 +147,18 @@ export class ProfileComponent implements OnInit {
         this.avatarGenderTab.set('boy');
       }
     }
+
+    // Configura a pesquisa debounced (350ms) exatamente como na Pokédex
+    this.searchSub = this.searchSubject
+      .pipe(debounceTime(350), distinctUntilChanged())
+      .subscribe((query) => {
+        this.pokemonSearchQuery.set(query);
+        this.resetAndSearchPokemons();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.searchSub?.unsubscribe();
   }
 
   onUsernameInput(val: string): void {
@@ -191,29 +212,69 @@ export class ProfileComponent implements OnInit {
     this.showAvatarModal.set(false);
   }
 
-  // POKÉMON FAVORITO MODAL METHODS
+  // POKÉMON FAVORITO MODAL & INFINITE SCROLL SEARCH
   openPokemonModal(): void {
     this.showPokemonModal.set(true);
-    this.searchPokemons(this.pokemonSearchQuery());
+    this.resetAndSearchPokemons();
   }
 
   closePokemonModal(): void {
     this.showPokemonModal.set(false);
   }
 
-  searchPokemons(query: string): void {
-    this.pokemonSearchQuery.set(query);
-    this.loadingPokemons.set(true);
+  onPokemonSearchInput(query: string): void {
+    this.searchSubject.next(query);
+  }
 
-    this.pokeApiService.getPokemonsWithFilters(0, 36, query).subscribe({
-      next: (res) => {
-        this.searchResults.set(res.data);
-        this.loadingPokemons.set(false);
-      },
-      error: () => {
-        this.loadingPokemons.set(false);
-      }
-    });
+  resetAndSearchPokemons(): void {
+    this.pokemonOffset = 0;
+    this.loadingPokemons.set(true);
+    this.hasMorePokemons.set(true);
+
+    this.pokeApiService
+      .getPokemonsWithFilters(0, this.pokemonLimit, this.pokemonSearchQuery())
+      .subscribe({
+        next: (res) => {
+          this.searchResults.set(res.data);
+          this.hasMorePokemons.set(res.hasMore);
+          this.loadingPokemons.set(false);
+        },
+        error: () => {
+          this.loadingPokemons.set(false);
+        }
+      });
+  }
+
+  loadMorePokemons(): void {
+    if (this.loadingMorePokemons() || !this.hasMorePokemons() || this.loadingPokemons()) return;
+
+    this.loadingMorePokemons.set(true);
+    this.pokemonOffset += this.pokemonLimit;
+
+    this.pokeApiService
+      .getPokemonsWithFilters(this.pokemonOffset, this.pokemonLimit, this.pokemonSearchQuery())
+      .subscribe({
+        next: (res) => {
+          this.searchResults.update((current) => [...current, ...res.data]);
+          this.hasMorePokemons.set(res.hasMore);
+          this.loadingMorePokemons.set(false);
+        },
+        error: () => {
+          this.loadingMorePokemons.set(false);
+        }
+      });
+  }
+
+  onModalGridScroll(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target) return;
+
+    const threshold = 150;
+    const isNearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - threshold;
+
+    if (isNearBottom && this.hasMorePokemons() && !this.loadingMorePokemons() && !this.loadingPokemons()) {
+      this.loadMorePokemons();
+    }
   }
 
   selectFavoritePokemon(pk: PokemonDetail): void {
