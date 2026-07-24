@@ -1,10 +1,40 @@
 <header class="app-header">
   <div class="header-content">
-    <div class="brand-logo" routerLink="/pokedex">
-      <!-- Ultra Ball Logo Image -->
-      <img src="ultraball.png" alt="PokéTeam Logo" class="brand-logo-img" />
-      <div class="brand-text">
-        <h1>Poké<span>Team</span></h1>
+    <div class="top-header-bar">
+      <div class="brand-logo" routerLink="/pokedex">
+        <!-- Ultra Ball Logo Image -->
+        <img src="ultraball.png" alt="PokéTeam Logo" class="brand-logo-img" />
+        <div class="brand-text">
+          <h1>Poké<span>Team</span></h1>
+        </div>
+      </div>
+
+      <div class="header-badges">
+        <!-- Settings Config Button -->
+        <button class="config-btn" (click)="openConfigModal()" title="Configurações de Tradução"
+          aria-label="Configurações">
+          <i class="ph-bold ph-gear"></i>
+        </button>
+
+        <!-- Auth User Badge / Login Button -->
+        <ng-container *ngIf="authService.isLoggedIn(); else guestTpl">
+          <div class="user-badge-group">
+            <span class="user-avatar-chip" [title]="authService.currentUser()?.email">
+              <i class="ph-bold ph-user-circle avatar-icon"></i>
+              <span class="user-name">{{ authService.currentUser()?.username }}</span>
+            </span>
+            <button class="logout-btn" (click)="logout()" title="Sair da conta">
+              <i class="ph-bold ph-sign-out"></i>
+            </button>
+          </div>
+        </ng-container>
+
+        <ng-template #guestTpl>
+          <a routerLink="/login" class="login-nav-btn">
+            <i class="ph-bold ph-user-circle"></i>
+            <span>Entrar</span>
+          </a>
+        </ng-template>
       </div>
     </div>
 
@@ -15,45 +45,17 @@
       </a>
       <a routerLink="/team-builder" routerLinkActive="active" class="nav-item">
         <i class="ph-bold ph-shield-chevron nav-icon"></i>
-        <span class="nav-label">Montar Times</span>
+        <span class="nav-label">Times</span>
       </a>
       <a routerLink="/saved-pokemons" routerLinkActive="active" class="nav-item">
         <i class="ph-bold ph-heart nav-icon"></i>
-        <span class="nav-label">Meus Pokémon</span>
+        <span class="nav-label">Salvos</span>
       </a>
       <a routerLink="/game-versions" routerLinkActive="active" class="nav-item">
         <i class="ph-bold ph-game-controller nav-icon"></i>
-        <span class="nav-label">Versões & Exclusivos</span>
+        <span class="nav-label">Versões</span>
       </a>
     </nav>
-
-    <div class="header-badges">
-      <!-- Settings Config Button -->
-      <button class="config-btn" (click)="openConfigModal()" title="Configurações de Tradução"
-        aria-label="Configurações">
-        <i class="ph-bold ph-gear"></i>
-      </button>
-
-      <!-- Auth User Badge / Login Button -->
-      <ng-container *ngIf="authService.isLoggedIn(); else guestTpl">
-        <div class="user-badge-group">
-          <span class="user-avatar-chip" [title]="authService.currentUser()?.email">
-            <i class="ph-bold ph-user-circle avatar-icon"></i>
-            <span class="user-name">{{ authService.currentUser()?.username }}</span>
-          </span>
-          <button class="logout-btn" (click)="logout()" title="Sair da conta">
-            <i class="ph-bold ph-sign-out"></i>
-          </button>
-        </div>
-      </ng-container>
-
-      <ng-template #guestTpl>
-        <a routerLink="/login" class="login-nav-btn">
-          <i class="ph-bold ph-user-circle"></i>
-          <span>Entrar / Cadastrar</span>
-        </a>
-      </ng-template>
-    </div>
   </div>
 </header>
 

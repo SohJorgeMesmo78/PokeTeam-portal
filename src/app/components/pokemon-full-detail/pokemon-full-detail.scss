@@ -912,6 +912,103 @@
   }
 }
 
+@media (max-width: 576px) {
+  .full-detail-container {
+    padding: 0.75rem 0.6rem;
+  }
+
+  .top-nav-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .back-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.82rem;
+  }
+
+  .top-right-gen-selector {
+    width: 100%;
+    justify-content: space-between;
+    padding: 0.35rem 0.75rem;
+
+    .gen-label {
+      font-size: 0.78rem;
+    }
+
+    .gen-select-dropdown {
+      font-size: 0.78rem;
+      padding: 0.25rem 0.5rem;
+    }
+  }
+
+  .hero-section {
+    padding: 1.25rem 1rem;
+    border-radius: 18px;
+
+    .pixel-sprite {
+      width: 110px;
+      height: 110px;
+    }
+
+    .pokemon-title {
+      font-size: 1.6rem;
+    }
+  }
+
+  .stats-pills-row {
+    gap: 0.4rem;
+
+    .stat-pill {
+      padding: 0.35rem 0.65rem;
+      font-size: 0.75rem;
+
+      .label { font-size: 0.68rem; }
+      .val { font-size: 0.8rem; }
+    }
+  }
+
+  .moves-tabs-bar {
+    overflow-x: auto;
+    width: 100%;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      padding: 0.4rem 0.65rem;
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+  }
+
+  .moves-table {
+    font-size: 0.78rem;
+
+    th, td {
+      padding: 0.45rem 0.4rem;
+    }
+  }
+
+  .move-modal-card {
+    padding: 1.25rem 1rem;
+    max-width: 95vw;
+  }
+
+  .move-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+
+    .m-stat-box {
+      padding: 0.5rem 0.25rem;
+      .m-label { font-size: 0.62rem; }
+      .m-val { font-size: 0.95rem; }
+    }
+  }
+}
+
 @media (min-width: 992px) {
   .evo-tree {
     align-items: center;
