@@ -70,6 +70,9 @@ export interface PokemonDetail {
   sprites: PokemonSprites;
   spriteUrl?: string;
   moves?: any;
+  firstGeneration?: number;
+  availableGenerations?: number[];
+  movesByGen?: Record<number, any>;
   exclusiveInfo?: {
     isExclusive: boolean;
     gameTag: string;

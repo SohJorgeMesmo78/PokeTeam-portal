@@ -705,8 +705,32 @@ export class TeamCreatorComponent implements OnInit {
     });
   }
 
+  private getGenFromGame(gameId: string): number {
+    if (!gameId || gameId === 'geral') return 9;
+
+    const clean = gameId.toLowerCase().trim();
+    if (['red', 'blue', 'yellow', 'red-blue'].includes(clean)) return 1;
+    if (['gold', 'silver', 'crystal', 'gold-silver'].includes(clean)) return 2;
+    if (['ruby', 'sapphire', 'emerald', 'firered', 'leafgreen', 'ruby-sapphire', 'firered-leafgreen'].includes(clean)) return 3;
+    if (['diamond', 'pearl', 'platinum', 'heartgold', 'soulsilver', 'diamond-pearl', 'heartgold-soulsilver'].includes(clean)) return 4;
+    if (['black', 'white', 'black2', 'white2', 'black-white'].includes(clean)) return 5;
+    if (['x', 'y', 'omegaruby', 'alphasapphire', 'x-y'].includes(clean)) return 6;
+    if (['sun', 'moon', 'ultrasun', 'ultramoon', 'sun-moon'].includes(clean)) return 7;
+    if (['sword', 'shield', 'brilliantdiamond', 'shiningpearl', 'sword-shield'].includes(clean)) return 8;
+    if (['scarlet', 'violet', 'scarlet-violet'].includes(clean)) return 9;
+
+    return 9;
+  }
+
   getFilteredMovesForTab(): any[] {
-    const movesObj = this.inspectingPokemonDetails()?.moves;
+    const details = this.inspectingPokemonDetails();
+    if (!details) return [];
+
+    const gen = this.getGenFromGame(this.selectedGame());
+    const movesObj = (details.movesByGen && details.movesByGen[gen])
+      ? details.movesByGen[gen]
+      : details.moves;
+
     if (!movesObj) return [];
 
     const tab = this.movePickerTab();
@@ -739,17 +763,24 @@ export class TeamCreatorComponent implements OnInit {
       return this.movesCache()[key];
     }
     const details = this.inspectingPokemonDetails();
-    if (details && details.moves) {
-      const allMoves: any[] = [
-        ...(details.moves.levelUp || []),
-        ...(details.moves.tm || []),
-        ...(details.moves.egg || []),
-        ...(details.moves.tutor || [])
-      ];
-      const match = allMoves.find(m => m.name.toLowerCase() === key);
-      if (match) {
-        this.registerMoveInCache(match);
-        return match;
+    if (details) {
+      const gen = this.getGenFromGame(this.selectedGame());
+      const movesObj = (details.movesByGen && details.movesByGen[gen])
+        ? details.movesByGen[gen]
+        : details.moves;
+
+      if (movesObj) {
+        const allMoves: any[] = [
+          ...(movesObj.levelUp || []),
+          ...(movesObj.tm || []),
+          ...(movesObj.egg || []),
+          ...(movesObj.tutor || [])
+        ];
+        const match = allMoves.find(m => m.name.toLowerCase() === key);
+        if (match) {
+          this.registerMoveInCache(match);
+          return match;
+        }
       }
     }
     return { name: moveName, type: 'normal', category: 'status', power: null, pp: null, accuracy: null };

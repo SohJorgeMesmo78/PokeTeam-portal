@@ -1,10 +1,19 @@
 <div class="full-detail-container">
-  <!-- Back Navigation Button -->
+  <!-- Back Navigation Button & Right Controls -->
   <div class="top-nav-bar">
     <button class="back-btn" routerLink="/pokedex">
       <i class="ph-bold ph-arrow-left"></i>
       <span>Voltar para a Pokédex</span>
     </button>
+
+    <div class="top-right-gen-selector" *ngIf="pokemon()?.availableGenerations?.length">
+      <span class="gen-label"><i class="ph-bold ph-lightning"></i> Geração de Golpes:</span>
+      <select [ngModel]="selectedGen()" (ngModelChange)="selectedGen.set($event)" class="gen-select-dropdown">
+        <option *ngFor="let g of pokemon().availableGenerations" [value]="g">
+          Geração {{ g }}
+        </option>
+      </select>
+    </div>
   </div>
 
   <!-- Loading State -->
@@ -236,7 +245,7 @@
               (click)="setTab('level')"
             >
               <i class="ph-bold ph-trend-up"></i>
-              <span>Por Nível ({{ pokemon().moves?.levelUp?.length || 0 }})</span>
+              <span>Por Nível ({{ currentGenMoves.levelUp.length || 0 }})</span>
             </button>
             <button 
               class="tab-btn" 
@@ -244,7 +253,7 @@
               (click)="setTab('tm')"
             >
               <i class="ph-bold ph-disc"></i>
-              <span>Por TM ({{ pokemon().moves?.tm?.length || 0 }})</span>
+              <span>Por TM ({{ currentGenMoves.tm.length || 0 }})</span>
             </button>
             <button 
               class="tab-btn" 
@@ -252,7 +261,7 @@
               (click)="setTab('egg')"
             >
               <i class="ph-bold ph-egg"></i>
-              <span>Por Cruzamento ({{ pokemon().moves?.egg?.length || 0 }})</span>
+              <span>Por Cruzamento ({{ currentGenMoves.egg.length || 0 }})</span>
             </button>
             <button 
               class="tab-btn" 
@@ -260,16 +269,16 @@
               (click)="setTab('tutor')"
             >
               <i class="ph-bold ph-student"></i>
-              <span>Por Tutor ({{ pokemon().moves?.tutor?.length || 0 }})</span>
+              <span>Por Tutor ({{ currentGenMoves.tutor.length || 0 }})</span>
             </button>
           </div>
 
           <!-- Tab Content: Level Up -->
           <div *ngIf="activeTab() === 'level'" class="tab-content">
-            <div *ngIf="!pokemon().moves?.levelUp?.length" class="no-moves">
-              Nenhum golpe por nível registrado.
+            <div *ngIf="!currentGenMoves.levelUp.length" class="no-moves">
+              Nenhum golpe por nível registrado para esta geração.
             </div>
-            <table *ngIf="pokemon().moves?.levelUp?.length" class="moves-table">
+            <table *ngIf="currentGenMoves.levelUp.length" class="moves-table">
               <thead>
                 <tr>
                   <th>Nível</th>
@@ -282,7 +291,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let m of pokemon().moves.levelUp" class="move-row-clickable" (click)="openMoveDetail(m)">
+                <tr *ngFor="let m of currentGenMoves.levelUp" class="move-row-clickable" (click)="openMoveDetail(m)">
                   <td><span class="level-badge">Lvl {{ m.level }}</span></td>
                   <td class="move-name-cell">{{ m.name }}</td>
                   <td>
@@ -305,12 +314,12 @@
 
           <!-- Tab Content: TM / Machine -->
           <div *ngIf="activeTab() === 'tm'" class="tab-content">
-            <div *ngIf="!pokemon().moves?.tm?.length" class="no-moves">
-              Nenhum golpe por TM registrado.
+            <div *ngIf="!currentGenMoves.tm.length" class="no-moves">
+              Nenhum golpe por TM registrado para esta geração.
             </div>
-            <div *ngIf="pokemon().moves?.tm?.length" class="moves-grid">
+            <div *ngIf="currentGenMoves.tm.length" class="moves-grid">
               <div 
-                *ngFor="let m of pokemon().moves.tm" 
+                *ngFor="let m of currentGenMoves.tm" 
                 class="move-card-chip tm-chip"
                 (click)="openMoveDetail(m)"
               >
@@ -330,12 +339,12 @@
 
           <!-- Tab Content: Egg / Breeding -->
           <div *ngIf="activeTab() === 'egg'" class="tab-content">
-            <div *ngIf="!pokemon().moves?.egg?.length" class="no-moves">
-              Nenhum golpe de cruzamento registrado.
+            <div *ngIf="!currentGenMoves.egg.length" class="no-moves">
+              Nenhum golpe de cruzamento registrado para esta geração.
             </div>
-            <div *ngIf="pokemon().moves?.egg?.length" class="moves-grid">
+            <div *ngIf="currentGenMoves.egg.length" class="moves-grid">
               <div 
-                *ngFor="let m of pokemon().moves.egg" 
+                *ngFor="let m of currentGenMoves.egg" 
                 class="move-card-chip egg-chip"
                 (click)="openMoveDetail(m)"
               >
@@ -355,12 +364,12 @@
 
           <!-- Tab Content: Tutor -->
           <div *ngIf="activeTab() === 'tutor'" class="tab-content">
-            <div *ngIf="!pokemon().moves?.tutor?.length" class="no-moves">
-              Nenhum golpe de tutor registrado.
+            <div *ngIf="!currentGenMoves.tutor.length" class="no-moves">
+              Nenhum golpe de tutor registrado para esta geração.
             </div>
-            <div *ngIf="pokemon().moves?.tutor?.length" class="moves-grid">
+            <div *ngIf="currentGenMoves.tutor.length" class="moves-grid">
               <div 
-                *ngFor="let m of pokemon().moves.tutor" 
+                *ngFor="let m of currentGenMoves.tutor" 
                 class="move-card-chip tutor-chip"
                 (click)="openMoveDetail(m)"
               >

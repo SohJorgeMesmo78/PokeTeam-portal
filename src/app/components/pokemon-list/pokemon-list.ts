@@ -13,6 +13,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Router } from '@angular/router';
 import { PokeApiService, GameVersionItem } from '../../services/poke-api.service';
 import { PokemonDetail, PokemonSpecies } from '../../models/pokemon.model';
 import { PokemonCardComponent } from '../pokemon-card/pokemon-card';
@@ -32,6 +33,7 @@ import { PokemonDetailModalComponent } from '../pokemon-detail-modal/pokemon-det
 })
 export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
   private pokeApiService = inject(PokeApiService);
+  private router = inject(Router);
 
   @ViewChild('scrollSentinel') scrollSentinel?: ElementRef<HTMLDivElement>;
 
@@ -286,19 +288,7 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openPokemonDetail(pokemon: PokemonDetail): void {
-    this.selectedPokemon.set(pokemon);
-    this.selectedSpecies.set(null);
-    this.loadingModal.set(true);
-
-    this.pokeApiService.getPokemonSpecies(pokemon.id).subscribe({
-      next: (species) => {
-        this.selectedSpecies.set(species);
-        this.loadingModal.set(false);
-      },
-      error: () => {
-        this.loadingModal.set(false);
-      }
-    });
+    this.router.navigate(['/pokemon', pokemon.id]);
   }
 
   closeModal(): void {

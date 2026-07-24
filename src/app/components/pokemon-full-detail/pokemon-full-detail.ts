@@ -1,5 +1,6 @@
 import { Component, OnInit, signal, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { PokeApiService } from '../../services/poke-api.service';
 import { ConfiguracaoService } from '../../services/configuracao.service';
@@ -7,7 +8,7 @@ import { ConfiguracaoService } from '../../services/configuracao.service';
 @Component({
   selector: 'app-pokemon-full-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './pokemon-full-detail.html',
   styleUrl: './pokemon-full-detail.scss'
 })
@@ -23,6 +24,7 @@ export class PokemonFullDetailComponent implements OnInit {
   activeTab = signal<'level' | 'tm' | 'egg' | 'tutor'>('level');
   selectedMove = signal<any | null>(null);
   selectedAbility = signal<any | null>(null);
+  selectedGen = signal<number>(1);
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -49,6 +51,11 @@ export class PokemonFullDetailComponent implements OnInit {
     this.pokeApiService.getPokemonDetails(idOrName).subscribe({
       next: (data) => {
         this.pokemon.set(data);
+        if (data?.firstGeneration) {
+          this.selectedGen.set(data.firstGeneration);
+        } else {
+          this.selectedGen.set(1);
+        }
         this.loading.set(false);
         if (typeof window !== 'undefined') {
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -59,6 +66,17 @@ export class PokemonFullDetailComponent implements OnInit {
         this.loading.set(false);
       }
     });
+  }
+
+  get currentGenMoves(): { levelUp: any[]; tm: any[]; egg: any[]; tutor: any[] } {
+    const p = this.pokemon();
+    if (!p) return { levelUp: [], tm: [], egg: [], tutor: [] };
+
+    const gen = Number(this.selectedGen());
+    if (p.movesByGen && p.movesByGen[gen]) {
+      return p.movesByGen[gen];
+    }
+    return p.moves || { levelUp: [], tm: [], egg: [], tutor: [] };
   }
 
   toggleShiny(): void {

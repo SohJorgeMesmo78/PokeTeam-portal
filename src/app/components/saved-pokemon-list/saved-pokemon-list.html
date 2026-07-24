@@ -312,6 +312,16 @@
           </select>
         </div>
 
+        <!-- Generation Field -->
+        <div class="form-field" *ngIf="inspectingPokemonDetails()?.availableGenerations?.length">
+          <label><i class="ph-bold ph-lightning"></i> Geração de Golpes:</label>
+          <select class="select-input" [ngModel]="selectedGen()" (ngModelChange)="selectedGen.set($event)">
+            <option *ngFor="let g of inspectingPokemonDetails()?.availableGenerations" [value]="g">
+              Geração {{ g }}
+            </option>
+          </select>
+        </div>
+
         <!-- BASE STATS PANEL WITH NATURE MODIFIERS -->
         <div *ngIf="inspectingPokemonDetails()?.stats" class="form-field full-width">
           <label><i class="ph-bold ph-chart-bar"></i> Estatísticas Base & Modificadores da Nature:</label>
