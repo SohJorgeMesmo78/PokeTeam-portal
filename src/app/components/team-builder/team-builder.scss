@@ -755,11 +755,90 @@
 
 @media (max-width: 640px) {
   .team-builder-container {
-    padding: 1.25rem 0.85rem 4rem 0.85rem;
+    padding: 0.75rem 0.5rem 4rem 0.5rem;
+    overflow-x: hidden;
+  }
+
+  .team-card {
+    padding: 0.85rem 0.65rem;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .team-card-header {
+    padding-bottom: 0.6rem;
+
+    .team-meta {
+      gap: 0.5rem;
+
+      .team-title {
+        font-size: 1.15rem;
+      }
+
+      .game-tag {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.55rem;
+      }
+    }
   }
 
   .members-row {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.4rem !important;
+    width: 100%;
+  }
+
+  .member-slot-display {
+    min-width: 0 !important;
+    padding: 0.5rem 0.35rem !important;
+    min-height: 120px !important;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .member-content {
+    min-width: 0 !important;
+    width: 100%;
+
+    .member-sprite {
+      width: 46px !important;
+      height: 46px !important;
+    }
+
+    .member-name {
+      font-size: 0.78rem !important;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .member-types {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.15rem;
+
+      .type-badge {
+        font-size: 0.62rem;
+        padding: 0.1rem 0.35rem;
+      }
+    }
+
+    .member-pills {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.15rem;
+      max-width: 100%;
+
+      .pill {
+        font-size: 0.6rem;
+        padding: 0.08rem 0.3rem;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
   }
 
   .slots-editor-grid {

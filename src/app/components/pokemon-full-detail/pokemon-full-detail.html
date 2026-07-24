@@ -278,7 +278,9 @@
             <div *ngIf="!currentGenMoves.levelUp.length" class="no-moves">
               Nenhum golpe por nível registrado para esta geração.
             </div>
-            <table *ngIf="currentGenMoves.levelUp.length" class="moves-table">
+
+            <!-- Desktop Table View -->
+            <table *ngIf="currentGenMoves.levelUp.length" class="moves-table desktop-moves-table">
               <thead>
                 <tr>
                   <th>Nível</th>
@@ -310,6 +312,31 @@
                 </tr>
               </tbody>
             </table>
+
+            <!-- Mobile Cards View -->
+            <div *ngIf="currentGenMoves.levelUp.length" class="mobile-moves-cards">
+              <div *ngFor="let m of currentGenMoves.levelUp" class="mobile-move-card" (click)="openMoveDetail(m)">
+                <div class="card-row-top">
+                  <div class="left-group">
+                    <span class="level-badge">Lvl {{ m.level }}</span>
+                    <span class="m-name">{{ m.name }}</span>
+                  </div>
+                  <span class="type-badge small" [ngClass]="'type-' + (m.type || 'normal')">
+                    {{ m.type || 'normal' }}
+                  </span>
+                </div>
+                <div class="card-row-bottom">
+                  <span class="cat-pill" [ngClass]="m.category || 'status'">
+                    <i [class]="getCategoryIconClass(m.category)"></i> {{ getCategoryLabel(m.category) }}
+                  </span>
+                  <div class="meta-stats-row">
+                    <span class="meta-item"><span class="lbl">Pwr:</span> {{ m.power ?? '-' }}</span>
+                    <span class="meta-item"><span class="lbl">Acc:</span> {{ m.accuracy ? m.accuracy + '%' : '-' }}</span>
+                    <span class="meta-item"><span class="lbl">PP:</span> {{ m.pp ?? '-' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Tab Content: TM / Machine -->
@@ -317,7 +344,8 @@
             <div *ngIf="!currentGenMoves.tm.length" class="no-moves">
               Nenhum golpe por TM registrado para esta geração.
             </div>
-            <div *ngIf="currentGenMoves.tm.length" class="moves-grid">
+            <!-- Desktop Grid View -->
+            <div *ngIf="currentGenMoves.tm.length" class="moves-grid desktop-moves-grid">
               <div 
                 *ngFor="let m of currentGenMoves.tm" 
                 class="move-card-chip tm-chip"
@@ -335,6 +363,29 @@
                 </div>
               </div>
             </div>
+            <!-- Mobile Cards View -->
+            <div *ngIf="currentGenMoves.tm.length" class="mobile-moves-cards">
+              <div *ngFor="let m of currentGenMoves.tm" class="mobile-move-card" (click)="openMoveDetail(m)">
+                <div class="card-row-top">
+                  <div class="left-group">
+                    <span class="m-name">{{ m.name }}</span>
+                  </div>
+                  <span class="type-badge small" [ngClass]="'type-' + (m.type || 'normal')">
+                    {{ m.type || 'normal' }}
+                  </span>
+                </div>
+                <div class="card-row-bottom">
+                  <span class="cat-pill" [ngClass]="m.category || 'status'">
+                    <i [class]="getCategoryIconClass(m.category)"></i> {{ getCategoryLabel(m.category) }}
+                  </span>
+                  <div class="meta-stats-row">
+                    <span class="meta-item"><span class="lbl">Pwr:</span> {{ m.power ?? '-' }}</span>
+                    <span class="meta-item"><span class="lbl">Acc:</span> {{ m.accuracy ? m.accuracy + '%' : '-' }}</span>
+                    <span class="meta-item"><span class="lbl">PP:</span> {{ m.pp ?? '-' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Tab Content: Egg / Breeding -->
@@ -342,7 +393,8 @@
             <div *ngIf="!currentGenMoves.egg.length" class="no-moves">
               Nenhum golpe de cruzamento registrado para esta geração.
             </div>
-            <div *ngIf="currentGenMoves.egg.length" class="moves-grid">
+            <!-- Desktop Grid View -->
+            <div *ngIf="currentGenMoves.egg.length" class="moves-grid desktop-moves-grid">
               <div 
                 *ngFor="let m of currentGenMoves.egg" 
                 class="move-card-chip egg-chip"
@@ -360,6 +412,29 @@
                 </div>
               </div>
             </div>
+            <!-- Mobile Cards View -->
+            <div *ngIf="currentGenMoves.egg.length" class="mobile-moves-cards">
+              <div *ngFor="let m of currentGenMoves.egg" class="mobile-move-card" (click)="openMoveDetail(m)">
+                <div class="card-row-top">
+                  <div class="left-group">
+                    <span class="m-name">{{ m.name }}</span>
+                  </div>
+                  <span class="type-badge small" [ngClass]="'type-' + (m.type || 'normal')">
+                    {{ m.type || 'normal' }}
+                  </span>
+                </div>
+                <div class="card-row-bottom">
+                  <span class="cat-pill" [ngClass]="m.category || 'status'">
+                    <i [class]="getCategoryIconClass(m.category)"></i> {{ getCategoryLabel(m.category) }}
+                  </span>
+                  <div class="meta-stats-row">
+                    <span class="meta-item"><span class="lbl">Pwr:</span> {{ m.power ?? '-' }}</span>
+                    <span class="meta-item"><span class="lbl">Acc:</span> {{ m.accuracy ? m.accuracy + '%' : '-' }}</span>
+                    <span class="meta-item"><span class="lbl">PP:</span> {{ m.pp ?? '-' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Tab Content: Tutor -->
@@ -367,7 +442,8 @@
             <div *ngIf="!currentGenMoves.tutor.length" class="no-moves">
               Nenhum golpe de tutor registrado para esta geração.
             </div>
-            <div *ngIf="currentGenMoves.tutor.length" class="moves-grid">
+            <!-- Desktop Grid View -->
+            <div *ngIf="currentGenMoves.tutor.length" class="moves-grid desktop-moves-grid">
               <div 
                 *ngFor="let m of currentGenMoves.tutor" 
                 class="move-card-chip tutor-chip"
@@ -382,6 +458,29 @@
                     {{ m.type || 'normal' }}
                   </span>
                   <span class="chip-power" *ngIf="m.power">PWR {{ m.power }}</span>
+                </div>
+              </div>
+            </div>
+            <!-- Mobile Cards View -->
+            <div *ngIf="currentGenMoves.tutor.length" class="mobile-moves-cards">
+              <div *ngFor="let m of currentGenMoves.tutor" class="mobile-move-card" (click)="openMoveDetail(m)">
+                <div class="card-row-top">
+                  <div class="left-group">
+                    <span class="m-name">{{ m.name }}</span>
+                  </div>
+                  <span class="type-badge small" [ngClass]="'type-' + (m.type || 'normal')">
+                    {{ m.type || 'normal' }}
+                  </span>
+                </div>
+                <div class="card-row-bottom">
+                  <span class="cat-pill" [ngClass]="m.category || 'status'">
+                    <i [class]="getCategoryIconClass(m.category)"></i> {{ getCategoryLabel(m.category) }}
+                  </span>
+                  <div class="meta-stats-row">
+                    <span class="meta-item"><span class="lbl">Pwr:</span> {{ m.power ?? '-' }}</span>
+                    <span class="meta-item"><span class="lbl">Acc:</span> {{ m.accuracy ? m.accuracy + '%' : '-' }}</span>
+                    <span class="meta-item"><span class="lbl">PP:</span> {{ m.pp ?? '-' }}</span>
+                  </div>
                 </div>
               </div>
             </div>

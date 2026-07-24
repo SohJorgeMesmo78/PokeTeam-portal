@@ -45,7 +45,7 @@ export class PokemonListComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedTypes = signal<string[]>([]);
   selectedGens = signal<number[]>([]);
   selectedGame = signal<string>('');
-  filtersCollapsed = signal<boolean>(false);
+  filtersCollapsed = signal<boolean>(true);
 
   // Card Grid density/sizing control ('compact' = ~6/row, 'normal' = ~4/row, 'large' = ~3/row)
   gridDensity = signal<'compact' | 'normal' | 'large'>('compact');

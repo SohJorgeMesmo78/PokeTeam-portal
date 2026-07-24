@@ -1630,20 +1630,94 @@
 
 @media (max-width: 640px) {
   .team-creator-container {
-    padding: 1.25rem 0.85rem 4rem 0.85rem;
+    padding: 0.75rem 0.6rem 4rem 0.6rem;
+  }
+
+  .slots-3x2-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .slot-rectangle-card {
+    padding: 0.75rem 0.65rem;
+    min-height: unset;
+    border-radius: 16px;
+  }
+
+  .slot-filled-card {
+    gap: 0.5rem;
+
+    .slot-card-body {
+      gap: 0.6rem;
+
+      .pokemon-sprite {
+        width: 52px;
+        height: 52px;
+      }
+
+      .pokemon-display-name {
+        font-size: 0.95rem;
+      }
+    }
+
+    .slot-moves-rich-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.35rem;
+      padding: 0.4rem;
+    }
+
+    .move-rich-chip {
+      padding: 0.25rem 0.35rem;
+
+      .m-top .m-name {
+        font-size: 0.68rem;
+      }
+    }
+  }
+
+  .available-section-card {
+    padding: 1rem 0.65rem;
+    border-radius: 18px;
+  }
+
+  .available-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .avail-pokemon-card {
+    padding: 0.6rem 0.4rem;
+    border-radius: 14px;
+
+    .avail-sprite {
+      width: 55px;
+      height: 55px;
+    }
+
+    .avail-name {
+      font-size: 0.8rem;
+    }
+
+    .type-badge {
+      font-size: 0.65rem;
+      padding: 0.1rem 0.4rem;
+    }
   }
 
   .modal-card {
-    padding: 1.25rem 1rem;
+    padding: 1.25rem 0.85rem;
+    max-width: 95vw;
     max-height: 94vh;
   }
 
   .games-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
   }
 
   .slots-choice-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
   }
 
   .presets-grid {
